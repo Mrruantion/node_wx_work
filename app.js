@@ -6,8 +6,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var ejs = require('ejs');
 
-var routes = require('./routes/index');
-// var users = require('./routes/users');
+var _index = require('./routes/index');
+var apply = require('./routes/apply');
 // var oil_stat = require('./routes/oil_stat');
 // var trip_stat = require('./routes/trip_stat');
 // var trip_record = require('./routes/trip_record')
@@ -46,17 +46,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// db state
 app.use(function(req, res, next) {
     req.con = con;
     next();
 });
 
-// app.use('/', routes);
-// app.use('/users', users);
-// app.use('/oil_stat',oil_stat);
-// app.use('/trip_stat',trip_stat)
-app.use('/',routes);
+app.use('/',_index);
+app.use('/apply',apply);
+// app.use('/grid',_index)
 // app.use('/trip_record',trip_record);
 
 // catch 404 and forward to error handler
