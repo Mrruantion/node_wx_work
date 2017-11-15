@@ -244,6 +244,7 @@ $(document).ready(function () {
                 onConfirm: function onConfirm(result) {
                     // console.log(result);
                     result[1].label == '温州市' ? is_kq = false : is_kq = true;
+                    getAudit()
                     var text = result.reduce(function (pre, current) {
                         return pre.label ? pre.label + current.label : pre + current.label
                     })
@@ -347,6 +348,7 @@ $(document).ready(function () {
     // console.log(_val)
     $('input[name="order"]').on('click', function (e) {
         form_option.night = e.target.value;
+        getAudit()
         console.log(form_option);
     });
 
@@ -361,7 +363,7 @@ $(document).ready(function () {
             } else if (_user.user.role == '局领导') {
 
             } else {
-                if (form_option.night || is_kq) {
+                if (form_option.night == 1 || is_kq) {
                     op.jwdepart = 10;
                     op.judepart = 1;
                 }
@@ -369,10 +371,31 @@ $(document).ready(function () {
             }
         }
     }
-    getAudit()
-    function showaudit(res){
-        // console.log(res,'res')
-        
+
+    function showaudit(res) {
+        console.log(res, 'res')
+        let auditer = res.filter(ele => { return ele.role == '科所队领导' || ele.role == '局领导' || ele.role == '警务保障室领导' })
+        console.log(auditer)
+        let k_l = res.filter(ele => { return ele.role == '科所队领导' })
+        let j_l = res.filter(ele => { return ele.role == '警务保障室领导' });
+        let ju_l = res.filter(ele => { return ele.role == '局领导' });
+        let apend_data = [k_l[0], j_l[0], ju_l[0]];
+        $('#add_auditer').empty();
+        apend_data.forEach((ele, index) => {
+            if (ele) {
+                let tr_content = '<div class="weui-cell__hd weui-flex" style="position: relative;">'
+                    + '<img src="https://weui.io/work/images/pic_160.png" class="" style="height:50px;width: 50px;display: block">'
+                    + '<span class="" style="position: absolute;top:-12px;right: 17px;">'
+                    + '<i class="weui-icon-cancel icon-delete"></i>'
+                    + '</span>'
+                    + '<span class="l_h_40 elli">...</span>'
+                    + '<span class="addr_book">'+ele.name+'</span>'
+                    + '</div>'
+                $('#add_auditer').append(tr_content);
+            }
+
+        })
+
 
 
     }
