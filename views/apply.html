@@ -24,6 +24,16 @@
                     </div>
                 </div>
             </div>
+            <div class="weui-cells tip">
+                <div class="weui-cell f15">
+                    <div class="weui-cell__hd">
+                        <label class="weui-label">同行人</label>
+                    </div>
+                    <div class="weui-cell__bd">
+                        <input class="weui-input t_a_r" placeholder="请输入" id="peer">
+                    </div>
+                </div>
+            </div>
 
             <!-- 所属部门 -->
             <!-- <div class="weui-cells tip">
@@ -36,7 +46,7 @@
             </div> -->
 
             <!-- 用车 -->
-            <div class="weui-cells tip">
+            <div class="weui-cells tip" style="display:none">
                 <div class="weui-cell weui-cell_access f15" id="borrow">
                     <div class="weui-cell__bd">
                         <span style="vertical-align: middle">用车</span>
@@ -57,7 +67,7 @@
 
             <!-- 选择车辆和驾驶员 -->
             <div id="car_driver" style="display:none">
-                <div class="weui-cells tip">
+                <!-- <div class="weui-cells tip">
                     <div class="weui-cell f15" id="select_car">
                         <div class="weui-cell__hd weui-flex__item">
                             <label class="weui-label ">车辆</label>
@@ -65,6 +75,14 @@
                         <div class="weui-cell__bd">
                             <div class="weui-cell__ft">请选择</div>
                         </div>
+                    </div>
+                </div> -->
+                <div class="weui-cells tip">
+                    <div class="weui-cell weui-cell_access f15" id="select_car">
+                        <div class="weui-cell__bd">
+                            <span style="vertical-align: middle">车辆</span>
+                        </div>
+                        <div class="weui-cell__ft">请选择</div>
                     </div>
                 </div>
                 <!-- <div class="weui-cells tip">
@@ -83,7 +101,7 @@
                             <label class="weui-label">驾驶人</label>
                         </div>
                         <div class="weui-cell__bd">
-                            <input class="weui-input t_a_r" placeholder="请输入" id="user">
+                            <input class="weui-input t_a_r" placeholder="请输入" id="driver">
                         </div>
                     </div>
                 </div>
@@ -106,7 +124,7 @@
                         <label class="weui-label">详细地址</label>
                     </div>
                     <div class="weui-cell__bd">
-                        <input class="weui-input t_a_r" placeholder="请输入" id="det_addr">
+                        <input class="weui-input t_a_r" placeholder="请输入" id="deta_addr">
                     </div>
                 </div>
             </div>
@@ -122,7 +140,7 @@
             </div>
 
             <!-- 过夜 -->
-            <div class="weui-cells tip">
+            <div class="weui-cells tip" id="night" style="display:none">
                 <div class="weui-cell f15">
                     <div class="weui-cell__hd weui-flex__item">
                         <label class="weui-label w_a">过夜</label>
@@ -135,7 +153,7 @@
             </div>
 
             <!-- 跨地区 -->
-            <div class="weui-cells tip">
+            <!-- <div class="weui-cells tip">
                 <div class="weui-cell f15">
                     <div class="weui-cell__hd weui-flex__item">
                         <label class="weui-label w_a">跨地区</label>
@@ -145,11 +163,11 @@
                         <input type="radio" value="0" name="addr" />否
                     </div>
                 </div>
-            </div>
+            </div> -->
 
 
 
-            <div class="f15 w_100 b_c_w tip">
+            <div class="f15 w_100 b_c_w tip" id="auditer" style="display:none">
                 <div class="weui-media-box weui-media-box_text p_b40">
                     <div class="weui-flex ">
                         <h4 class=" weui-flex__item weui-media-box__title f15">
@@ -198,13 +216,13 @@
                 <p class="weui-toast__content">提交成功</p>
             </div>
         </div>
-        <div id="submit_unsuccess" style="opacity: 0; display: none;">
+        <!-- <div id="submit_unsuccess" style="opacity: 0; display: none;">
             <div class="weui-mask_transparent"></div>
             <div class="weui-toast">
                 <i class="weui-icon-warn  weui-icon_toast"></i>
                 <p class="weui-toast__content">xxx不能为空</p>
             </div>
-        </div>
+        </div> -->
 
 
     </div>
@@ -215,258 +233,7 @@
     <script src="./js/zepto.min.js"></script>
     <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script src="./js/weui.js"></script>
-    <script type="text/javascript" src="./js/apply.js">
-
-        // $('#audit_user').on('click', function () {
-        //     $('#container').hide();
-        //     $('#audit_list').show();
-
-        //     var state = { 'page_id': 1, 'user_id': 5 };
-        //     var title = '选择审核人';
-        //     var url = 'book';
-
-        //     history.pushState(state, title, url);
-        //     window.addEventListener('popstate', function (e) {
-        //         // console.log(e);
-        //         $('#container').show();
-        //         $('#audit_list').hide();
-        //     });
-
-        //     $.ajax({
-        //         url: './grid',
-        //         dataType: 'json',
-        //         timeout: 10000,
-        //         type: 'get',
-        //         success: function (res) {
-        //             console.log(res)
-        //         },
-        //         error: function (err) {
-
-        //         },
-        //     })
-        // })
-
-        // var $submit_success = $('#submit_success');
-        // $('#toastBtn').on('click', function () {
-        //     if ($submit_success.css('display') != 'none') return;
-        //     $submit_success.fadeIn(100);
-        //     setTimeout(function () {
-        //         $submit_success.fadeOut(100);
-        //     }, 3000);
-        // });
-        // // var $submit_unsuccess = $('#submit_unsuccess');
-        // // $('#toastBtn').on('click', function () {
-        // //     if ($submit_unsuccess.css('display') != 'none') return;
-        // //     $submit_unsuccess.fadeIn(100);
-        // //     setTimeout(function () {
-        // //         $submit_unsuccess.fadeOut(100);
-        // //     }, 3000);
-        // // });
-        // // console.log(1)
-
-        // $('#depart').on('click', function () {
-        //     weui.picker([
-        //         {
-        //             label: '政治处',
-        //             value: '1'
-        //         }, {
-        //             label: '工会',
-        //             value: '2'
-        //         }, {
-        //             label: '禁毒大队',
-        //             value: '3'
-        //         }
-        //     ], {
-        //             defaultValue: ['1'],
-        //             onChange: function (result) {
-        //                 // console.log(result, '1');
-        //             },
-        //             onConfirm: function (result) {
-        //                 // console.log(result, '2');
-        //                 $('#depart .weui-cell__ft').text(result[0].label);
-        //                 $('#depart .weui-cell__ft').css({ color: '#000' })
-        //             },
-        //             id: 'depart'
-        //         });
-        // });
-
-
-        // $('#address').on('click', function () {
-        //     weui.picker([{
-        //         label: '广东',
-        //         value: 0,
-        //         children: [{
-        //             label: '广州',
-        //             value: 0,
-        //             children: [{
-        //                 label: '海珠',
-        //                 value: 0
-        //             }, {
-        //                 label: '番禺',
-        //                 value: 1
-        //             }]
-        //         }, {
-        //             label: '佛山',
-        //             value: 1,
-        //             children: [{
-        //                 label: '禅城',
-        //                 value: 0
-        //             }, {
-        //                 label: '南海',
-        //                 value: 1
-        //             }]
-        //         }]
-        //     }, {
-        //         label: '广西',
-        //         value: 1,
-        //         children: [{
-        //             label: '南宁',
-        //             value: 0,
-        //             children: [{
-        //                 label: '青秀',
-        //                 value: 0
-        //             }, {
-        //                 label: '兴宁',
-        //                 value: 1
-        //             }]
-        //         }, {
-        //             label: '桂林',
-        //             value: 1,
-        //             children: [{
-        //                 label: '象山',
-        //                 value: 0
-        //             }, {
-        //                 label: '秀峰',
-        //                 value: 1
-        //             }]
-        //         }]
-        //     }], {
-        //             depth: 3,
-        //             defaultValue: [0, 1, 1],
-        //             onChange: function onChange(result) {
-        //                 console.log(result);
-        //             },
-        //             onConfirm: function onConfirm(result) {
-        //                 // console.log(result);
-        //                 var text = result.reduce(function (pre, current) {
-        //                     return pre.label ? pre.label + current.label : pre + current.label
-        //                 })
-        //                 // console.log(text)
-        //                 $('#address .weui-cell__ft').text(text);
-        //                 $('#address .weui-cell__ft').css({ color: '#000' })
-        //             },
-        //             id: 'address'
-        //         });
-        // });
-
-        // var use_reason = ['执法办案', '社会面管理', '重大勤务', '督察检查', '指挥通信', '现场勘查', '押解', '勤务保障', '其他执法执勤']
-        // // use_reason.forEach((ele,index) => {
-
-        // // })
-        // var op_arr = [];
-        // for (var i = 0; i < use_reason.length; i++) {
-        //     var op_i = {};
-        //     op_i.label = use_reason[i];
-        //     op_i.value = i + 1;
-        //     op_arr.push(op_i);
-        // }
-        // console.log(op_arr)
-        // $('#reason').on('click', function () {
-        //     weui.picker(op_arr, {
-        //         defaultValue: ['1'],
-        //         onChange: function (result) {
-        //             console.log(result);
-        //         },
-        //         onConfirm: function (result) {
-        //             // console.log(result);
-        //             var text = result[0].label;
-        //             $('#reason .weui-cell__ft').text(text);
-        //             $('#reason .weui-cell__ft').css({ color: '#000' })
-        //         },
-        //         id: 'reason'
-        //     });
-        // });
-        // $('#select_car').on('click', function () {
-        //     weui.picker([
-        //         {
-        //             label: '浙C9A228',
-        //             value: '1'
-        //         }, {
-        //             label: '浙C9A228(李某某 18325263654)',
-        //             value: '2'
-        //         }, {
-        //             label: '浙C9A228',
-        //             value: '3'
-        //         }
-        //     ], {
-        //             defaultValue: ['1'],
-        //             onChange: function (result) {
-        //                 console.log(result);
-        //             },
-        //             onConfirm: function (result) {
-        //                 console.log(result);
-        //             },
-        //             id: 'select_car'
-        //         });
-        // });
-        // $('#select_driver').on('click', function () {
-        //     weui.picker([
-        //         {
-        //             label: '李某某',
-        //             value: '1'
-        //         }, {
-        //             label: '张某某',
-        //             value: '2'
-        //         }, {
-        //             label: '林某某',
-        //             value: '3'
-        //         }
-        //     ], {
-        //             defaultValue: ['1'],
-        //             onChange: function (result) {
-        //                 console.log(result);
-        //             },
-        //             onConfirm: function (result) {
-        //                 console.log(result);
-        //             },
-        //             id: 'select_driver'
-        //         });
-        // });
-
-        // $('#borrow').on('click', function () {
-        //     weui.picker([
-        //         {
-        //             label: '本单位车辆',
-        //             value: '1'
-        //         }, {
-        //             label: '向其他单位借车',
-        //             value: '2'
-        //         }, {
-        //             label: '向车队申请派车',
-        //             value: '3'
-        //         }
-        //     ], {
-        //             defaultValue: ['1'],
-        //             onChange: function (result) {
-        //                 // console.log(result);
-
-        //             },
-        //             onConfirm: function (result) {
-        //                 // console.log(result);
-        //                 if (result[0].value == 3) {
-        //                     $('#car_driver').hide()
-        //                 } else {
-        //                     $('#car_driver').show()
-        //                 }
-        //                 $('#borrow .weui-cell__ft').text(result[0].label);
-        //                 $('#borrow .weui-cell__ft').css({ color: '#000' })
-        //             },
-        //             id: 'borrow'
-        //         });
-        // });
-        // console.log(location, '111')
-
-    </script>
+    <script type="text/javascript" src="./js/apply.js"></script>
     <!-- <script src="./js/example.js"></script> -->
 </body>
 

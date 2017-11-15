@@ -14,7 +14,7 @@ var apply = require('./routes/apply');
 // // DataBase 
 var mysql = require("mysql");
 
-var con = mysql.createConnection({
+var con = mysql.createPool({
     host: "582c1a40635ca.sh.cdb.myqcloud.com",
     port:'5079',
     user: "ruian",
@@ -22,13 +22,13 @@ var con = mysql.createConnection({
     database: "ruian"
 });
 
-con.connect(function(err) {
-    if (err) {
-        console.log('connecting error');
-        return;
-    }
-    console.log('connecting success');
-});
+// con.connect(function(err) {
+//     if (err) {
+//         console.log('connecting error');
+//         return;
+//     }
+//     console.log('connecting success');
+// });
 
 var app = express();
 
@@ -76,6 +76,11 @@ if (app.get('env') === 'development') {
         });
     });
 }
+
+process.on('uncaughtException', function (err) {
+    // console.error(err.stack);
+    // console.log("Node NOT Exiting...");
+});
 
 // production error handler
 // no stacktraces leaked to user
