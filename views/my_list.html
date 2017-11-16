@@ -11,16 +11,16 @@
 </head>
 
 <body ontouchstart>
-    <div class="container f14" id="container">
+    <div class="container f14" id="container" style="display:none">
         <div class="b_c_w b_b_1">
             <div class="weui-cell">
                 <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                    <img src="https://weui.io/work/images/pic_160.png" style="width: 50px;display: block">
+                    <img src="./img/emoji-1.png" style="width: 50px;display: block">
                     <!-- <span class="weui-badge" style="position: absolute;top: -.4em;right: -.4em;">8</span> -->
                 </div>
                 <div class="weui-cell__bd">
                     <h4 class="weui-media-box__title f_w_7">
-                        <span style="vertical-align: middle">我的用车</span>
+                        <span style="vertical-align: middle" id="name">我的用车</span>
                         <span class="weui-badge great auditing chang_f12" style="margin-left: 5px;">审批中</span>
                     </h4>
                 </div>
@@ -29,70 +29,55 @@
                 <div class="weui-flex__item">
                     <div class="weui-cell">
                         <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                            <!-- <img src="https://weui.io/work/images/pic_160.png" style="width: 50px;display: block"> -->
-                            <!-- <span class="weui-badge" style="position: absolute;top: -.4em;right: -.4em;">8</span> -->
                             <p class="c_9">事由</p>
                         </div>
                         <div class="weui-cell__bd">
-                            <p>督察检查</p>
+                            <p id="days"></p>
                         </div>
                     </div>
                 </div>
                 <div class="weui-flex__item">
                     <div class="weui-cell">
                         <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                            <!-- <img src="https://weui.io/work/images/pic_160.png" style="width: 50px;display: block"> -->
-                            <!-- <span class="weui-badge" style="position: absolute;top: -.4em;right: -.4em;">8</span> -->
-                            <p class="c_9">部门</p>
+                            <p class="c_9">同行</p>
                         </div>
                         <div class="weui-cell__bd">
-                            <p>政治处</p>
+                            <p id="peer"></p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="weui-flex">
-                <div class="weui-flex__item">
-                    <div class="weui-cell">
-                        <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                            <!-- <img src="https://weui.io/work/images/pic_160.png" style="width: 50px;display: block"> -->
-                            <p class="c_9">地址</p>
-                        </div>
-                        <div class="weui-cell__bd">
-                            <p>浙江省温州市瑞安市</p>
-                        </div>
+                <!-- <div class="weui-flex__item"> -->
+                <div class="weui-cell">
+                    <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
+                        <p class="c_9">地址</p>
+                    </div>
+                    <div class="weui-cell__bd">
+                        <p id="province"></p>
                     </div>
                 </div>
-                <div class="weui-flex__item">
-                    <div class="weui-cell">
-                        <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                            <p class="c_9">联系人名称</p>
-                        </div>
-                        <div class="weui-cell__bd">
-                            <p>联系人名称</p>
-                        </div>
-                    </div>
-                </div>
+                <!-- </div> -->
+
             </div>
             <div class="weui-flex">
                 <div class="weui-flex__item">
                     <div class="weui-cell">
                         <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                            <!-- <img src="https://weui.io/work/images/pic_160.png" style="width: 50px;display: block"> -->
+                            <p class="c_9">详细地址</p>
+                        </div>
+                        <div class="weui-cell__bd">
+                            <p id="address"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="weui-flex__item">
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
                             <p class="c_9">是否在外过夜</p>
                         </div>
                         <div class="weui-cell__bd">
-                            <p>是</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="weui-flex__item">
-                    <div class="weui-cell">
-                        <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                            <p class="c_9">是否跨地区</p>
-                        </div>
-                        <div class="weui-cell__bd">
-                            <p>否</p>
+                            <p id="night"></p>
                         </div>
                     </div>
                 </div>
@@ -102,11 +87,11 @@
                 <div class="weui-flex__item">
                     <div class="weui-cell">
                         <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                            <!-- <img src="https://weui.io/work/images/pic_160.png" style="width: 50px;display: block"> -->
+                            <!-- <img src="./img/emoji-1.png" style="width: 50px;display: block"> -->
                             <p class="c_9">车辆</p>
                         </div>
                         <div class="weui-cell__bd">
-                            <p>浙C13451</p>
+                            <p id="car_num"></p>
                         </div>
                     </div>
                 </div>
@@ -116,7 +101,7 @@
                             <p class="c_9">驾驶员</p>
                         </div>
                         <div class="weui-cell__bd">
-                            <p>333333</p>
+                            <p id="driver"></p>
                         </div>
                     </div>
                 </div>
@@ -124,21 +109,35 @@
         </div>
         <div class="b_c_w tip" style="margin-top:5px">
             <div class="advice flow">审批流程</div>
-            <div class="weui-flex">
+            <div id="auditer">
+
+            </div>
+            <!-- <div class="weui-flex">
                 <div class="weui-flex__item">
                     <div class="weui-cell weui-cell_access p_0 ">
-                        <!-- <div class="f14"> -->
                         <div class="flow_agree weui-media-box_text w_100">
                             <i class="weui-icon-circle f14 flow_agree_icon"></i>
-                            <img src="https://weui.io/work/images/pic_160.png" class="small_img">
+                            <img src="./img/emoji-1.png" class="small_img">
                             <span class="f_w_7 ">某某某·审批中</span>
                         </div>
-                        <!-- </div> -->
                     </div>
                 </div>
-            </div>
+            </div> -->
+            <!-- <div class="weui-flex">
+                <div class="weui-flex__item">
+                    <div class="weui-cell weui-cell_access p_0 ">
+                        <div class="f14">
+                        <div class="flow_agree weui-media-box_text w_100">
+                            <i class="weui-icon-circle f14 flow_agree_icon"></i>
+                            <img src="./img/emoji-1.png" class="small_img">
+                            <span class="f_w_7 ">某某某·审批中</span>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
         </div>
-        <!-- <div class="b_c_w submit b_t_1">
+        <div class="b_c_w submit b_t_1" id="other_button" style="display:none">
             <div class="advice c_9">审批意见</div>
             <div class="weui-flex">
                 <div class="weui-flex__item">
@@ -155,17 +154,17 @@
                         </div>
                     </a>
                 </div>
-                <div class="weui-flex__item">
+                <!-- <div class="weui-flex__item">
                     <a class="weui-cell weui-cell_access p_0 " href="javascript:;">
                         <div class="weui-media-box weui-media-box_text w_100 t_a_c">
                             <i class="weui-icon-circle f14"></i> 转审
                         </div>
                     </a>
-                </div>
+                </div> -->
             </div>
-        </div> -->
-        <div class="b_c_w submit b_t_1">
-            <div class="weui-flex">
+        </div>
+        <div class="b_c_w submit b_t_1" style="display:none" id="my_button">
+            <div class="weui-flex" >
                 <div class="weui-flex__item">
                     <a class="weui-cell weui-cell_access p_0 " href="javascript:;">
                         <!-- <div class="f14"> -->
@@ -200,7 +199,8 @@
     <script src="./js/zepto.min.js"></script>
     <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script> -->
     <script src="./js/weui.js"></script>
-    <script>
+    <script src="./js/public.js"></script>
+    <script src="./js/my_list.js">
         // console.log(_g)
     </script>
 </body>

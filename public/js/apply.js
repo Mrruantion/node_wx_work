@@ -8,7 +8,8 @@ $(document).ready(function () {
 
     console.log(_user)
     if (_user.user) {
-        form_option.uid = _user.user.id
+        form_option.uid = _user.user.id;
+        form_option.role = _user.user.role;
         if (_user.user.role == "科所队领导") {
             get_carData(_user.depart.id, 1)
             $('#borrow').parent().hide();
@@ -19,6 +20,7 @@ $(document).ready(function () {
             $('#borrow').parent().hide();
             $('#night').hide();
             $('#auditer').hide();
+            form_option.driver = 3
         } else {
             $('#borrow').parent().show();
             $('#night').show();
@@ -55,13 +57,17 @@ $(document).ready(function () {
         function get_car(res) {
             console.log(res, 'car')
             car_data = [];
+            let user_car = [];
             res.forEach((ele, index) => {
                 var op = {};
                 ele.name ? op.label = ele.cname + '(' + ele.name + ele.mobile + ')' : op.label = ele.cname;
                 op.value = ele.cid;
-                car_data.push(op)
+                car_data.push(op);
+                !ele.name ? user_car.push(ele):null
             })
-            is_kl ? car_data.length ? weui.alert('本部门没有车,由车队派车') : null : null;
+            is_kl ? !user_car.length ? weui.alert('本部门没有可使用车辆,由车队派车') : null : null;
+            is_kl ? !user_car.length ? form_option.driver = 3 : null : null;
+            is_kl ? !user_car.length ? $('#car_driver').hide() : null : null;
         }
     }
 
@@ -119,11 +125,13 @@ $(document).ready(function () {
                     // console.log(result);
                     // form_option.borrow = result[0];
                     var _v = result[0].value;
+                    form_option.driver = _v;
+                    $("#driver").val("")
                     delete_depart();
                     delete_car();
                     if (_v == 3) {
                         $('#car_driver').hide();
-                        $('#borrow_depart1').hide()
+                        $('#borrow_depart1').hide();
                     } else {
                         _v == 1 ? $('#car_driver').show() : $('#car_driver').hide();
                         _v == 2 ? $('#borrow_depart1').show() : $('#borrow_depart1').hide();
@@ -172,7 +180,7 @@ $(document).ready(function () {
 
                 },
                 onConfirm: function (result) {
-                    form_option.depart = result[0].value;
+                    // form_option.depart = result[0].value;
                     delete_car();
                     get_carData(result[0].value);
                     $('#car_driver').show()
@@ -285,14 +293,7 @@ $(document).ready(function () {
 
 
 
-    var $submit_success = $('#submit_success');
-    $('#toastBtn').on('click', function () {
-        if ($submit_success.css('display') != 'none') return;
-        $submit_success.fadeIn(100);
-        setTimeout(function () {
-            $submit_success.fadeOut(100);
-        }, 3000);
-    });
+
     // var $submit_unsuccess = $('#submit_unsuccess');
     // $('#toastBtn').on('click', function () {
     //     if ($submit_unsuccess.css('display') != 'none') return;
@@ -371,7 +372,32 @@ $(document).ready(function () {
             }
         }
     }
+    function show_auditer(data) {
+        $('#add_auditer').empty();
+        data.forEach((ele, index) => {
+            if (ele) {
+                let str = 'show_i' + index
+                let tr_content = `<div class="weui-cell__hd weui-flex" style="position: relative;" >
+                    <img src="https://weui.io/work/images/pic_160.png" class="" style="height:50px;width: 50px;display: block">
+                    <span class="" style="position: absolute;top:-12px;right: 17px;" id="` + str + `">
+                    <i class="weui-icon-cancel icon-delete"></i>
+                    </span>
+                    <span class="l_h_40 elli">...</span>
+                    <span class="addr_book">` + ele.name + `</span>
+                    </div>`
+                $('#add_auditer').append(tr_content);
+                let ff = '#' + str
+                $(ff).on('click', function (res) {
+                    // select_auditer(ele)
+                    // console.log(index)
+                    apend_data[index] = null;
+                    show_auditer(apend_data);
+                })
+            }
 
+        })
+    }
+    let apend_data = [];
     function showaudit(res) {
         console.log(res, 'res')
         let auditer = res.filter(ele => { return ele.role == '科所队领导' || ele.role == '局领导' || ele.role == '警务保障室领导' })
@@ -379,26 +405,163 @@ $(document).ready(function () {
         let k_l = res.filter(ele => { return ele.role == '科所队领导' })
         let j_l = res.filter(ele => { return ele.role == '警务保障室领导' });
         let ju_l = res.filter(ele => { return ele.role == '局领导' });
-        let apend_data = [k_l[0], j_l[0], ju_l[0]];
-        $('#add_auditer').empty();
-        apend_data.forEach((ele, index) => {
-            if (ele) {
-                let tr_content = '<div class="weui-cell__hd weui-flex" style="position: relative;">'
-                    + '<img src="https://weui.io/work/images/pic_160.png" class="" style="height:50px;width: 50px;display: block">'
-                    + '<span class="" style="position: absolute;top:-12px;right: 17px;">'
-                    + '<i class="weui-icon-cancel icon-delete"></i>'
-                    + '</span>'
-                    + '<span class="l_h_40 elli">...</span>'
-                    + '<span class="addr_book">'+ele.name+'</span>'
-                    + '</div>'
-                $('#add_auditer').append(tr_content);
-            }
+        apend_data = [k_l[0], j_l[0], ju_l[0]];
+        // $('#add_auditer').empty();
+        show_auditer(apend_data)
 
-        })
+        $('#audit_list').empty();
+        if (ju_l.length) {
+            ju_l.forEach((ele, index) => {
+                let str = 'ju_l' + index
+                let tr_content = `<div class="weui-cell weui-cell_access" id="` + str + `">
+                <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
+                    <img src="./img/emoji-1.png" style="width: 50px;display: block">
+                </div>
+                <div class="weui-cell__bd">
+                    <p>`+ ele.name + `</p>
+                    <p style="font-size: 13px;color: #888888;">`+ ele.role + `</p>
+                </div>
+            </div>`
+                $('#audit_list').append(tr_content);
+                let ff = '#' + str
+                $(ff).on('click', function (res) {
+                    select_auditer(ele)
+                })
+            })
+        }
+        if (j_l.length) {
+            j_l.forEach((ele, index) => {
+                let str = 'j_l' + index
+                let tr_content = `<div class="weui-cell weui-cell_access" id="` + str + `">
+                    <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
+                        <img src="./img/emoji-1.png" style="width: 50px;display: block">
+                    </div>
+                    <div class="weui-cell__bd">
+                        <p>`+ ele.name + `</p>
+                        <p style="font-size: 13px;color: #888888;">`+ ele.role + `</p>
+                    </div>
+                </div>`
+                $('#audit_list').append(tr_content);
+                let ff = '#' + str
+                $(ff).on('click', function (res) {
+                    select_auditer(ele)
+                })
+            })
+        }
+        if (k_l.length) {
+            k_l.forEach((ele, index) => {
+                let str = 'k_l' + index
+                let tr_content = `<div class="weui-cell weui-cell_access" id="` + str + `">
+                <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
+                    <img src="./img/emoji-1.png" style="width: 50px;display: block">
+                </div>
+                <div class="weui-cell__bd">
+                    <p>`+ ele.name + `</p>
+                    <p style="font-size: 13px;color: #888888;">`+ ele.role + `</p>
+                </div>
+            </div>`
 
+                $('#audit_list').append(tr_content);
+                let ff = '#' + str
+                $(ff).on('click', function (res) {
+                    // console.log(ele, index, 'ddd')
+                    select_auditer(ele)
+                })
+            })
 
+        }
+    }
 
+    function select_auditer(data) {
+        if (data.role == '局领导') {
+            apend_data[2] = data
+        } else if (data.role == '警务保障室领导') {
+            apend_data[1] = data
+        } else {
+            apend_data[0] = data;
+        }
+        history.back();
+        show_auditer(apend_data);
     }
 
 
+
+
+
+    // var $submit_success = $('#submit_success');
+    $('#toastBtn').on('click', function () {
+        // console.log(form_option)
+        let data = [];
+        let str = [];
+        // form_option.auditer = apend_data;
+        form_option.id = 0;
+        form_option.cre_tm = ~~(new Date().getTime() / 1000);
+        // console.log(form_option);
+
+        // for (var o in form_option) {
+        //     // str += o + ','
+        //     str.push(o)
+        //     data.push(form_option[o])
+        // }
+        if (!form_option.name) {
+            weui.alert('请输入使用人');
+            return;
+        }
+        if (!form_option.province) {
+            weui.alert('请选择地址');
+            return;
+        }
+        if (!form_option.days) {
+            weui.alert('请选择事由');
+            return;
+        }
+        if (_user.user) {
+            if (_user.user.role == "科所队领导") {
+
+            } else if (_user.user.role == '局领导') {
+
+            } else {
+                if (!form_option.driver) {
+                    weui.alert('请选择用车')
+                } else {
+
+                    if (!form_option.car_num && form_option.driver != 3) {
+                        weui.alert('请选择车辆');
+                        return;
+                    }
+                }
+                if (form_option.driver == 1 || form_option.driver == 2) {
+                    if (!form_option.car_num) {
+                        weui.alert('请选择车辆');
+                        return;
+                    }
+                    weui.alert('请输入驾驶人');
+                    return;
+                } else {
+                    // if (form_option.driver.length > 1) {
+                    //     weui.alert('请输入驾驶人');
+                    //     return;
+                    // }
+                }
+
+            }
+        }
+
+        let push_op = {
+            form_option: form_option,
+            auditer: apend_data
+        }
+
+        console.log(str)
+       
+        getJson('/add_apply', function(res){
+            // console.log(res)
+            weui.alert('提交成功', function () {
+                top.location = '/my_list?applyid='+res
+            });
+        }, push_op)
+
+
+
+    });
 });
