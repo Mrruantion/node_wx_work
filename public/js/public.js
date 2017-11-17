@@ -52,3 +52,17 @@ W.getSearch = function(){
     }
     return json;
 };
+
+W.dateToString = function(d) {
+    var j = {};
+    j.m = d.getMonth() + 1;
+    j.d = d.getDate();
+    j.h = d.getHours();
+    j.mi = d.getMinutes();
+    j.s = d.getSeconds();
+    for (items in j) {
+        if (j[items] < 10)
+            j[items] = "0" + j[items];
+    }
+    return d.getFullYear() + "-" + j.m + "-" + j.d + " " + j.h + ":" + j.mi + ":" + j.s;
+}

@@ -1,3 +1,5 @@
+// import { setTimeout } from 'timers';
+
 var express = require('express');
 var router = express.Router();
 var addr = require('./_areaData')
@@ -93,7 +95,7 @@ router.get('/getaudit', function (req, res, next) {
 })
 
 
-
+//提交申请
 router.get('/add_apply', function (req, res, next) {
     var db = req.con;
     var query = req.query;
@@ -183,7 +185,7 @@ router.get('/add_apply', function (req, res, next) {
 // router.get('./')
 
 
-
+//获取申请详情
 router.get('/getapply_list', function (req, res, next) {
     let db = req.con;
     let query = req.query;
@@ -198,12 +200,75 @@ router.get('/getapply_list', function (req, res, next) {
         let sql2 = "select a.*,b.* from (select * ,ga_spstatus.id As sid,ga_spstatus.status As sstatus from ga_spstatus where apply_id = " + query.applyid + ") as a left join ga_user as b on a.uid = b.id";
         console.log(sql2)
         db.query(sql2, function (err, rows) {
-            console.log(err,row)
+            console.log(err, row)
             _r_o.spstatus = rows;
             res.json(_r_o);
         })
 
     })
     // console.log(query)
+})
+
+//获取我的提交列表
+router.get('/get_applys', function (req, res, next) {
+    var db = req.con;
+    var query = req.query;
+    var str = 'select * from ga_apply where uid = ' + query.uid + ' order by id desc ';
+    db.query(str, function (err, rows) {
+        console.log(rows, '')
+        let data = rows || [];
+        if (data.length >= 1) {
+            let i = 0;
+            data.forEach((ele, index) => {
+                var str2 = 'select * from ga_spstatus where apply_id = ' + ele.id;
+                db.query(str2, function (error, row) {
+                    i++;
+                    console.log(str2, error, index, i)
+                    ele.spstatus = row || [];
+                    if (data.length == i) {
+                        res.json(data);
+                    }
+
+                })
+
+            })
+        } else {
+            res.json(rows)
+        }
+    })
+})
+
+
+//获取我审核的列表
+router.get('/audit_list', function (req, res, next) {
+    var db = req.con;
+    var query = req.query;
+    var str = 'select a.*,b.* from (select *,ga_spstatus.id as sid,ga_spstatus.uid as suid,ga_spstatus.status as sstatus,ga_spstatus.cre_tm as scre_tm  from ga_spstatus where uid = ' + query.uid + ') as a left join ga_apply as b on a.apply_id = b.id order by a.id desc'
+    // var str = 'select * from ga_spstatus where uid = ' + query.uid
+    let _index = 0;
+    db.query(str, function (err, rows) {
+        console.log(err, rows, query);
+        let data = rows;
+        data.forEach((ele, index) => {
+            console.log(_index)
+            if (ele.id) {
+                let str1 = 'select * from ga_spstatus where apply_id = ' + ele.id;
+                db.query(str1, function (err, rowss) {
+                    _index++;
+                    console.log(str1, _index)
+                    ele.spstatus = rowss;
+                    if (data.length == _index) {
+                        res.json(rows);
+                    }
+                })
+            } else {
+                _index++;
+                if (rows.length == _index) {
+                    res.json(rows);
+                }
+            }
+        })
+        // res.json(rows)
+    })
 })
 module.exports = router;

@@ -21,7 +21,7 @@
                 <div class="weui-cell__bd">
                     <h4 class="weui-media-box__title f_w_7">
                         <span style="vertical-align: middle" id="name">我的用车</span>
-                        <span class="weui-badge great auditing chang_f12" style="margin-left: 5px;">审批中</span>
+                        <span class="weui-badge great auditing chang_f12" style="margin-left: 5px;" id="_spstatus"></span>
                     </h4>
                 </div>
             </div>
@@ -83,7 +83,7 @@
                 </div>
             </div>
 
-            <div class="weui-flex">
+            <div class="weui-flex" id="car_driver">
                 <div class="weui-flex__item">
                     <div class="weui-cell">
                         <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
@@ -102,6 +102,19 @@
                         </div>
                         <div class="weui-cell__bd">
                             <p id="driver"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="weui-flex" id="use_car" style="display:none">
+                <div class="weui-flex__item">
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
+                            <!-- <img src="./img/emoji-1.png" style="width: 50px;display: block"> -->
+                            <p class="c_9">车辆</p>
+                        </div>
+                        <div class="weui-cell__bd">
+                            <p id="cars"></p>
                         </div>
                     </div>
                 </div>
@@ -164,7 +177,7 @@
             </div>
         </div>
         <div class="b_c_w submit b_t_1" style="display:none" id="my_button">
-            <div class="weui-flex" >
+            <div class="weui-flex">
                 <div class="weui-flex__item">
                     <a class="weui-cell weui-cell_access p_0 " href="javascript:;">
                         <!-- <div class="f14"> -->

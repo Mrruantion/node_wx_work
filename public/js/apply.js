@@ -63,7 +63,7 @@ $(document).ready(function () {
                 ele.name ? op.label = ele.cname + '(' + ele.name + ele.mobile + ')' : op.label = ele.cname;
                 op.value = ele.cid;
                 car_data.push(op);
-                !ele.name ? user_car.push(ele):null
+                !ele.name ? user_car.push(ele) : null
             })
             is_kl ? !user_car.length ? weui.alert('本部门没有可使用车辆,由车队派车') : null : null;
             is_kl ? !user_car.length ? form_option.driver = 3 : null : null;
@@ -517,7 +517,12 @@ $(document).ready(function () {
         }
         if (_user.user) {
             if (_user.user.role == "科所队领导") {
-
+                if (apend_data.length != 1) {
+                    weui.alert('请选择审核人')
+                } else {
+                    form_option.status = 1;
+                    form_option.estatus = 1;
+                }
             } else if (_user.user.role == '局领导') {
 
             } else {
@@ -545,7 +550,48 @@ $(document).ready(function () {
                 }
 
             }
+            // let 
+            if (form_option.night > 0 || is_kq) {
+                let is_ok = false
+                apend_data.forEach((ele, index) => {
+                    if (!ele && index == 0) {
+                        weui.alert('请选择科所队领导');
+                        is_ok = true;
+                        return;
+                    } else if (!ele && index == 1) {
+                        weui.alert('请选择警务保障室领导');
+                        is_ok = true;
+                        return ;
+                    } else if (!ele && index == 2) {
+                        weui.alert('请选择局领导');
+                        is_ok = true;
+                        return ;
+                    } else {
+                        form_option.status = 3;
+                        form_option.estatus = 3;
+                    }
+                })
+                if(is_ok){
+                    return;
+                }
+                // if (apend_data.length != 3) {
+                //     weui.alert('该申请为三级审批，请选择科所队领导、警务保障室领导和局领导')
+                // } else {
+
+                // }
+            } else {
+                if (!apend_data[0]) {
+                    weui.alert('请选择审核人');
+                    return;
+
+                } else {
+                    form_option.status = 1;
+                    form_option.estatus = 1;
+                }
+            }
         }
+
+
 
         let push_op = {
             form_option: form_option,
@@ -553,11 +599,11 @@ $(document).ready(function () {
         }
 
         console.log(str)
-       
-        getJson('/add_apply', function(res){
+
+        getJson('/add_apply', function (res) {
             // console.log(res)
             weui.alert('提交成功', function () {
-                top.location = '/my_list?applyid='+res
+                top.location = '/my_list?applyid=' + res + '&my=true'
             });
         }, push_op)
 
