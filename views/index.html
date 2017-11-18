@@ -166,6 +166,30 @@
                                 </a> -->
                             </div>
                         </div>
+                        <!-- 车队还车 -->
+                        <!-- <div class="weui-tab__content b_c_w" id="back_list">
+                            <div class="b_c_w f14" id="backing_list">
+
+                            </div>
+                        </div> -->
+
+                        <!-- 车队还车 -->
+                        <div class="weui-tab__content b_c_w" id="back_list">
+                            <div class="weui-tab2 h_93 b_c_w" id="tab2">
+                                <div class="weui-navbar2">
+                                    <div class="weui-navbar__item2">还车</div>
+                                    <div class="weui-navbar__item2">派车</div>
+                                </div>
+                                <div class="weui-tab__panel">
+                                    <div class="weui-tab__content2 b_c_w" id="ss11">
+
+                                    </div>
+                                    <div class="weui-tab__content2 b_c_w" id="ss22">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="weui-tabbar">
                         <a href="javascript:;" class="weui-tabbar__item weui-bar__item_on">
@@ -189,6 +213,14 @@
                             </span>
                             <p class="weui-tabbar__label">已提交</p>
                         </a>
+                        <a href="javascript:;" class="weui-tabbar__item" style="display:none" id="show_back">
+                            <span style="display: inline-block;position: relative;">
+                                <!-- <img src="./images/icon_tabbar.png" alt="" class="weui-tabbar__icon"> -->
+                                <i class="icon iconfont icon-tijiao" style="color:#0681bb;font-size:26px"></i>
+                                <!-- <span class="weui-badge weui-badge_dot" style="position: absolute;top: 0;right: -6px;"></span> -->
+                            </span>
+                            <p class="weui-tabbar__label">车队派还车</p>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -199,15 +231,15 @@
     <script src="./js/zepto.min.js"></script>
     <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script src="./js/weui.js"></script>
-    <script type ="text/javascript" src="./js/public.js"></script>
+    <script type="text/javascript" src="./js/public.js"></script>
     <script type="text/javascript" src="./js/index.js"></script>
     <script type="text/javascript">
         var _g = W.getSearch();
-        if(_g.UserId){
-            W.setCookie('userid',_g.UserId,2);
+        if (_g.UserId) {
+            W.setCookie('userid', _g.UserId, 2);
         }
         let userid = W.getCookie('userid');
-        if(!userid){
+        if (!userid) {
             top.location = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wwb0e4ffce3f6d8a8f&redirect_uri=http://h5.bibibaba.cn/qy_oauth2.php&response_type=code&scope=snsapi_userinfo&agentid=1000002&state=STATE#wechat_redirect'
         }
     </script>

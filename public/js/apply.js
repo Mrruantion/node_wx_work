@@ -378,7 +378,7 @@ $(document).ready(function () {
             if (ele) {
                 let str = 'show_i' + index
                 let tr_content = `<div class="weui-cell__hd weui-flex" style="position: relative;" >
-                    <img src="https://weui.io/work/images/pic_160.png" class="" style="height:50px;width: 50px;display: block">
+                    <img src="./img/1.png" class="" style="height:50px;width: 50px;display: block">
                     <span class="" style="position: absolute;top:-12px;right: 17px;" id="` + str + `">
                     <i class="weui-icon-cancel icon-delete"></i>
                     </span>
@@ -415,7 +415,7 @@ $(document).ready(function () {
                 let str = 'ju_l' + index
                 let tr_content = `<div class="weui-cell weui-cell_access" id="` + str + `">
                 <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                    <img src="./img/emoji-1.png" style="width: 50px;display: block">
+                    <img src="./img/1.png" style="width: 50px;display: block">
                 </div>
                 <div class="weui-cell__bd">
                     <p>`+ ele.name + `</p>
@@ -434,7 +434,7 @@ $(document).ready(function () {
                 let str = 'j_l' + index
                 let tr_content = `<div class="weui-cell weui-cell_access" id="` + str + `">
                     <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                        <img src="./img/emoji-1.png" style="width: 50px;display: block">
+                        <img src="./img/1.png" style="width: 50px;display: block">
                     </div>
                     <div class="weui-cell__bd">
                         <p>`+ ele.name + `</p>
@@ -453,7 +453,7 @@ $(document).ready(function () {
                 let str = 'k_l' + index
                 let tr_content = `<div class="weui-cell weui-cell_access" id="` + str + `">
                 <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                    <img src="./img/emoji-1.png" style="width: 50px;display: block">
+                    <img src="./img/1.png" style="width: 50px;display: block">
                 </div>
                 <div class="weui-cell__bd">
                     <p>`+ ele.name + `</p>
@@ -517,7 +517,7 @@ $(document).ready(function () {
         }
         if (_user.user) {
             if (_user.user.role == "科所队领导") {
-                if (apend_data.length != 1) {
+                if (!apend_data[0]) {
                     weui.alert('请选择审核人')
                 } else {
                     form_option.status = 1;
@@ -561,17 +561,17 @@ $(document).ready(function () {
                     } else if (!ele && index == 1) {
                         weui.alert('请选择警务保障室领导');
                         is_ok = true;
-                        return ;
+                        return;
                     } else if (!ele && index == 2) {
                         weui.alert('请选择局领导');
                         is_ok = true;
-                        return ;
+                        return;
                     } else {
                         form_option.status = 3;
                         form_option.estatus = 3;
                     }
                 })
-                if(is_ok){
+                if (is_ok) {
                     return;
                 }
                 // if (apend_data.length != 3) {
@@ -580,14 +580,17 @@ $(document).ready(function () {
 
                 // }
             } else {
-                if (!apend_data[0]) {
-                    weui.alert('请选择审核人');
-                    return;
+                if (_user.user.role != '局领导') {
+                    if (!apend_data[0]) {
+                        weui.alert('请选择审核人');
+                        return;
 
-                } else {
-                    form_option.status = 1;
-                    form_option.estatus = 1;
+                    } else {
+                        form_option.status = 1;
+                        form_option.estatus = 1;
+                    }
                 }
+
             }
         }
 
@@ -603,6 +606,7 @@ $(document).ready(function () {
         getJson('/add_apply', function (res) {
             // console.log(res)
             weui.alert('提交成功', function () {
+                sendmessage(res, apend_data[0].userid)
                 top.location = '/my_list?applyid=' + res + '&my=true'
             });
         }, push_op)
@@ -610,4 +614,23 @@ $(document).ready(function () {
 
 
     });
+    function sendmessage(id, userid, t) {
+        var titles = t || '用车申请'
+        str = 'http://jct.chease.cn' + '/my_list?applyid=' + id
+        let url = 'http://h5.bibibaba.cn/send_qywx.php?touser=' + userid
+            + '&toparty=&totag=&'
+            + 'title=' + titles + '&'
+            + 'desc=' + _user.user.name + '的用车&'
+            + 'url=' + str + '&remark=查看详情'
+        // if (res.spstatus[0]) {
+        W.ajax(url, {
+            dataType: 'json',
+            success: function (res) {
+                // console.log(res)
+                // weui.alert('已催办')
+                history.back()
+            }
+        })
+        // }
+    }
 });

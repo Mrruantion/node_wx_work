@@ -15,7 +15,7 @@
         <div class="b_c_w b_b_1">
             <div class="weui-cell">
                 <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                    <img src="./img/emoji-1.png" style="width: 50px;display: block">
+                    <img src="./img/1.png" style="width: 50px;display: block">
                     <!-- <span class="weui-badge" style="position: absolute;top: -.4em;right: -.4em;">8</span> -->
                 </div>
                 <div class="weui-cell__bd">
@@ -120,6 +120,29 @@
                 </div>
             </div>
         </div>
+
+        <!-- 选择车辆和驾驶员 -->
+        <div id="pcar_driver" style="display:none">
+            <div class="weui-cells tip">
+                <div class="weui-cell weui-cell_access f15" id="select_car">
+                    <div class="weui-cell__bd">
+                        <span style="vertical-align: middle">车辆</span>
+                    </div>
+                    <div class="weui-cell__ft" id="carss">请选择</div>
+                </div>
+            </div>
+            <div class="weui-cells tip">
+                <div class="weui-cell f15" id="select_driver">
+                    <div class="weui-cell__hd weui-flex__item">
+                        <label class="weui-label ">驾驶员</label>
+                    </div>
+                    <div class="weui-cell__bd">
+                        <div class="weui-cell__ft" id="driverss">请选择</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
         <div class="b_c_w tip" style="margin-top:5px">
             <div class="advice flow">审批流程</div>
             <div id="auditer">
@@ -154,14 +177,14 @@
             <div class="advice c_9">审批意见</div>
             <div class="weui-flex">
                 <div class="weui-flex__item">
-                    <a class="weui-cell weui-cell_access p_0 " href="javascript:;">
+                    <a class="weui-cell weui-cell_access p_0 " href="javascript:;" id="agree">
                         <div class="weui-media-box weui-media-box_text w_100 t_a_c">
                             <i class="weui-icon-success-no-circle f14"></i> 同意
                         </div>
                     </a>
                 </div>
                 <div class="weui-flex__item">
-                    <a class="weui-cell weui-cell_access p_0 " href="javascript:;">
+                    <a class="weui-cell weui-cell_access p_0 " href="javascript:;" id="reject">
                         <div class="weui-media-box weui-media-box_text w_100 t_a_c">
                             <i class="weui-icon-cancel f14"></i> 驳回
                         </div>
@@ -179,7 +202,7 @@
         <div class="b_c_w submit b_t_1" style="display:none" id="my_button">
             <div class="weui-flex">
                 <div class="weui-flex__item">
-                    <a class="weui-cell weui-cell_access p_0 " href="javascript:;">
+                    <a class="weui-cell weui-cell_access p_0 " href="javascript:;" id='urge'>
                         <!-- <div class="f14"> -->
                         <div class="weui-media-box weui-media-box_text w_100 t_a_c">
                             <i class="weui-icon-success-no-circle f14"></i> 催办
@@ -188,7 +211,7 @@
                     </a>
                 </div>
                 <div class="weui-flex__item">
-                    <a class="weui-cell weui-cell_access p_0 " href="javascript:;">
+                    <a class="weui-cell weui-cell_access p_0 " href="javascript:;" id="backout">
                         <!-- <div class="f14"> -->
                         <div class="weui-media-box weui-media-box_text w_100 t_a_c">
                             <i class="weui-icon-cancel f14"></i> 撤销
@@ -196,11 +219,64 @@
                         <!-- </div> -->
                     </a>
                 </div>
-                <div class="weui-flex__item">
+                <div class="weui-flex__item" style="display:none">
                     <a class="weui-cell weui-cell_access p_0 " href="javascript:;">
                         <!-- <div class="f14"> -->
                         <div class="weui-media-box weui-media-box_text w_100 t_a_c">
                             <i class="weui-icon-circle f14"></i> 重新提交
+                        </div>
+                        <!-- </div> -->
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="b_c_w submit b_t_1" style="display:none" id="back_car">
+            <div class="weui-flex">
+                <div class="weui-flex__item">
+                    <a class="weui-cell weui-cell_access p_0 " href="javascript:;" id="backout_car">
+                        <!-- <div class="f14"> -->
+                        <div class="weui-media-box weui-media-box_text w_100 t_a_c">
+                            <i class="weui-icon-success-no-circle f14"></i> 申请还车
+                        </div>
+                        <!-- </div> -->
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="b_c_w submit b_t_1" style="display:none" id="carlist_back">
+            <div class="weui-flex">
+                <div class="weui-flex__item">
+                    <a class="weui-cell weui-cell_access p_0 " href="javascript:;" >
+                        <!-- <div class="f14"> -->
+                        <div class="weui-media-box weui-media-box_text w_100 t_a_c">
+                            <i class="weui-icon-success-no-circle f14"></i> 车队还车
+                        </div>
+                        <!-- </div> -->
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="b_c_w submit b_t_1" style="display:none" id="back_carlist">
+            <div class="weui-flex">
+                <div class="weui-flex__item">
+                    <a class="weui-cell weui-cell_access p_0 " href="javascript:;" id="">
+                        <!-- <div class="f14"> -->
+                        <div class="weui-media-box weui-media-box_text w_100 t_a_c">
+                            <i class="weui-icon-success-no-circle f14"></i> 还车
+                        </div>
+                        <!-- </div> -->
+                    </a>
+                </div>
+            </div>
+        </div>
+       
+        <div class="b_c_w submit b_t_1" style="display:none" id="pcar_dd">
+            <div class="weui-flex">
+                <div class="weui-flex__item">
+                    <a class="weui-cell weui-cell_access p_0 " href="javascript:;" id="pcar_dd1">
+                        <!-- <div class="f14"> -->
+                        <div class="weui-media-box weui-media-box_text w_100 t_a_c">
+                            <i class="weui-icon-success-no-circle f14"></i> 派车
                         </div>
                         <!-- </div> -->
                     </a>
