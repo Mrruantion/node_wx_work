@@ -25,10 +25,13 @@ router.get('/get_depart', function (req, res, next) {
         res.json(rows)
     });
 })
+
 //获取地址
 router.get('/address', function (req, res, next) {
     res.json(addr)
 })
+
+
 //获取个人信息
 router.get('/get_user', function (req, res, next) {
     var db = req.con;
@@ -49,13 +52,11 @@ router.get('/get_user', function (req, res, next) {
         } else {
             res.json(data);
         }
-
-
     })
     // console.log(query, 'query')
 })
 
-
+//获取单位车辆
 router.get('/get_car', function (req, res, next) {
     var db = req.con;
     var depart = req.query.depart;
@@ -76,7 +77,7 @@ router.get('/get_car', function (req, res, next) {
 
 
 
-
+//获取审核人
 router.get('/getaudit', function (req, res, next) {
     var db = req.con;
     var query = req.query;
@@ -140,7 +141,8 @@ router.get('/add_apply', function (req, res, next) {
                     id: 0,
                     uid: ele.id,
                     apply_id: applyid,
-                    cre_tm: _cre_tm
+                    cre_tm: _cre_tm,
+                    isagree: 0
                 }
                 if (ele.role == "科所队领导") {
                     _sop.status = 1
@@ -211,7 +213,7 @@ router.get('/getapply_list', function (req, res, next) {
     let query = req.query;
 
     // let sql = 'select * from ga_apply where id = ' + query.applyid;
-    let sql = 'select a.*,b.* from (select * ,ga_apply.id as aid from ga_apply where id = ' + query.applyid + ') as a left join (select *,ga_user.id as usid,ga_user.name as uname,ga_user.status as ustatus from ga_user where id > 0) as b on a.uid = b.id'
+    let sql = 'select a.*,b.* from (select * ,ga_apply.id as aid, ga_apply.name as aname from ga_apply where id = ' + query.applyid + ') as a left join (select *,ga_user.id as usid,ga_user.name as uname,ga_user.status as ustatus from ga_user where id > 0) as b on a.uid = b.id'
     // let sql = ' select * from ga_apply where id = ' + query.applyid 
     let _r_o = {};
     db.query(sql, function (err, row) {
@@ -254,17 +256,16 @@ router.get('/get_applys', function (req, res, next) {
         if (data.length >= 1) {
             let i = 0;
             data.forEach((ele, index) => {
-                var str2 = 'select * from ga_spstatus where apply_id = ' + ele.id + 'order by ga_spstatus.status';
+                var str2 = 'select * from ga_spstatus where apply_id = ' + ele.id + ' order by status';
                 db.query(str2, function (error, row) {
                     i++;
+                    console.log(i, 'i', typeof row)
                     console.log(str2, error, index, i)
                     ele.spstatus = row || [];
                     if (data.length == i) {
                         res.json(data);
                     }
-
                 })
-
             })
         } else {
             res.json(rows)
@@ -277,7 +278,7 @@ router.get('/get_applys', function (req, res, next) {
 router.get('/audit_list', function (req, res, next) {
     var db = req.con;
     var query = req.query;
-    var str = 'select a.*,b.* from (select *,ga_spstatus.id as sid,ga_spstatus.uid as suid,ga_spstatus.status as sstatus,ga_spstatus.cre_tm as scre_tm  from ga_spstatus where uid = ' + query.uid + ') as a left join ga_apply as b on a.apply_id = b.id order by a.id desc'
+    var str = 'select a.*,b.* from (select *,ga_spstatus.id as sid,ga_spstatus.uid as suid,ga_spstatus.status as sstatus,ga_spstatus.cre_tm as scre_tm  from ga_spstatus where uid = ' + query.uid + ' and isagree > 0) as a left join ga_apply as b on a.apply_id = b.id order by a.id desc'
     // var str = 'select * from ga_spstatus where uid = ' + query.uid
     let _index = 0;
     db.query(str, function (err, rows) {
@@ -286,10 +287,10 @@ router.get('/audit_list', function (req, res, next) {
         data.forEach((ele, index) => {
             console.log(_index)
             if (ele.id) {
-                let str1 = 'select * from ga_spstatus where apply_id = ' + ele.id + ' order by ga_spstatus.status';
+                let str1 = 'select * from ga_spstatus where apply_id = ' + ele.id + ' order by status';
                 db.query(str1, function (err, rowss) {
                     _index++;
-                    console.log(str1, _index)
+                    // console.log(str1, _index)
                     ele.spstatus = rowss;
                     if (data.length == _index) {
                         res.json(rows);
@@ -306,11 +307,47 @@ router.get('/audit_list', function (req, res, next) {
     })
 })
 
+//获取未处理的审核列表
+router.get('/no_audit_list', function (req, res, next) {
+    var db = req.con;
+    var query = req.query;
+    var str = 'select a.*,b.* from (select *,ga_spstatus.id as sid,ga_spstatus.uid as suid,ga_spstatus.status as sstatus,ga_spstatus.cre_tm as scre_tm  from ga_spstatus where uid = ' + query.uid + ' and isagree = 0) as a left join ga_apply as b on a.apply_id = b.id order by a.id desc'
+    // var str = 'select * from ga_spstatus where uid = ' + query.uid
+    let _index = 0;
+    db.query(str, function (err, rows) {
+        console.log(err, rows, query);
+        let data = rows;
+        data.forEach((ele, index) => {
+            console.log(_index)
+            if (ele.id) {
+                let str1 = 'select * from ga_spstatus where apply_id = ' + ele.id + ' order by status';
+                db.query(str1, function (err, rowss) {
+                    _index++;
+                    // console.log(str1, _index)
+                    ele.spstatus = rowss;
+                    if (data.length == _index) {
+                        res.json(rows);
+                    }
+                })
+            } else {
+                _index++;
+                if (rows.length == _index) {
+                    res.json(rows);
+                }
+            }
+        })
+        // res.json(rows)
+    })
+})
+
+
+
+
 //获取车队还车列表
 router.get('/getcar_num', function (req, res, next) {
     var db = req.con;
     var query = req.query;
-    let str1 = "select a.*,b.* from (select *, ga_cart.id AS cid,ga_cart.name AS cname,ga_cart.uid AS cuid,ga_cart.depart AS cdepart from ga_cart where depart = " + query.depart + ") as a left join (select *,ga_apply.id AS aid,ga_apply.depart AS adepart from ga_apply where etm='0') as b on a.name=b.car_num";
+    let str1 = "select a.*,b.* from (select *, ga_cart.id AS cid,ga_cart.name AS cname,ga_cart.uid AS cuid,ga_cart.depart AS cdepart from ga_cart where depart = " + query.depart + ") as a left join (select *,ga_apply.id AS aid,ga_apply.depart AS adepart from ga_apply where etm='0') as b on a.name=b.car_num order by b.id desc";
     console.log(str1)
     // let str = 'select * from ga_cart where depart = 58';
     let i = 0;
@@ -318,7 +355,7 @@ router.get('/getcar_num', function (req, res, next) {
         // res.json(row)
         row.forEach(ele => {
             let _eid = ele.id || 0
-            let str = 'select * from ga_spstatus where apply_id = ' + _eid +'order by ga_spstatus.status';
+            let str = 'select * from ga_spstatus where apply_id = ' + _eid + ' order by status';
             console.log(str, 'str')
             db.query(str, function (er, ro) {
                 console.log(row.length, i, er)
@@ -335,7 +372,7 @@ router.get('/getcar_num', function (req, res, next) {
     })
 })
 
-
+//更新申请状态
 router.get('/up_apply', function (req, res, next) {
     var db = req.con;
     var query = req.query;
@@ -348,19 +385,27 @@ router.get('/up_apply', function (req, res, next) {
     // console.log(str)
 })
 
+//审核是否同意
 router.get('/agree_apply', function (req, res, next) {
     var db = req.con;
     var query = req.query;
     let str = 'UPDATE ga_spstatus SET isagree=' + query.isagree + ' WHERE id=' + query.id;
     db.query(str, function (err, row) {
         console.log(row);
-        res.json(row)
+        if (query.isagree == 2) {
+            let str1 = 'update ga_apply set etm = ' + query.etm + ' where id = ' + query.applyid;
+            db.query(str1, function (error, ros) {
+                res.json(row);
+            })
+        } else {
+            res.json(row);
+        }
 
     })
 })
 
 
-
+//获取需要派车的申请列表
 router.get('/getdriver', function (req, res, next) {
     var db = req.con;
     var query = req.query;
@@ -373,7 +418,7 @@ router.get('/getdriver', function (req, res, next) {
         if (data.length >= 1) {
             let i = 0;
             data.forEach((ele, index) => {
-                var str2 = 'select * from ga_spstatus where apply_id = ' + ele.id;
+                var str2 = 'select * from ga_spstatus where apply_id = ' + ele.id + ' order by status';
                 db.query(str2, function (error, row) {
                     i++;
                     console.log(str2, error, index, i)
@@ -392,7 +437,7 @@ router.get('/getdriver', function (req, res, next) {
 })
 
 
-
+//获取司机和车辆
 router.get('/getcar_driver', function (req, res, next) {
     var db = req.con;
     var query = req.query;
@@ -412,7 +457,7 @@ router.get('/getcar_driver', function (req, res, next) {
     })
 })
 
-
+//车队派车
 router.get('/up_applypc', function (req, res, next) {
     var db = req.con;
     var query = req.query;

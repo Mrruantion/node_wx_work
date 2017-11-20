@@ -82,7 +82,7 @@ W.ajax = function (url, options) {
     };
     json.url = url;
     Object.assign(json, options);
-    Object.assign(headers, options.headers);
+    options.headers ? Object.assign(headers, options.headers) : null;
 
     json.type = json.type.toUpperCase();
     var data = "";

@@ -23,6 +23,7 @@ $(document).ready(function () {
     function getapply_spstatus(res) {
         console.log(res)
         // $('#container').hide();
+        let username = res.apply[0].aname
         res.apply.forEach(ele => {
             $('#address').text(ele.address);
             $('#days').text(ele.days);
@@ -100,20 +101,21 @@ $(document).ready(function () {
                 }
                 let _res = res;
                 $('#urge').on('click', function () {
-                    str = 'http://jct.chease.cn' + '/my_list?applyid=' + res.apply[0].aid
-                    let url = 'http://h5.bibibaba.cn/send_qywx.php?touser=' + res.spstatus[0].userid
-                        + '&toparty=&totag=&'
-                        + 'title=用车申请&'
-                        + 'desc=' + _user.user.name + '的用车&'
-                        + 'url=' + str + '&remark=查看详情'
-                    // if (res.spstatus[0]) {
-                    W.ajax(url, {
-                        dataType: 'json',
-                        success: function (res) {
-                            // console.log(res)
-                            weui.alert('已催办')
-                        }
-                    })
+                    // str = 'http://jct.chease.cn' + '/my_list?applyid=' + res.apply[0].aid
+                    // let url = 'http://h5.bibibaba.cn/send_qywx.php?touser=' + res.spstatus[0].userid
+                    //     + '&toparty=&totag=&'
+                    //     + 'title=用车申请&'
+                    //     + 'desc=' + _user.user.name + '的用车&'
+                    //     + 'url=' + str + '&remark=查看详情'
+                    // // if (res.spstatus[0]) {
+                    // W.ajax(url, {
+                    //     dataType: 'json',
+                    //     success: function (res) {
+                    //         console.log(res)
+                    //         weui.alert('已催办')
+                    //     }
+                    // })
+                    sendmessage(res.apply[0].aid, res.spstatus[0].userid, username, null, '已催办')
                     // }
                 })
 
@@ -121,17 +123,19 @@ $(document).ready(function () {
                     // let etm = 
                     getJson('./agree_apply', function (res) {
                         // console.log(res)
-                        sendmessage(_res.apply[0].aid, _res.apply[0].userid, '审批通过');
-                        history.go(0)
+                        sendmessage(_res.apply[0].aid, _res.apply[0].userid, username, '审批通过');
+                        // history.go(0)
 
                     }, { id: res.spstatus[0].sid, isagree: 1 })
                 })
                 $('#reject').on('click', function () {
+                    let re_etm = ~~(new Date().getTime() / 1000);
+
                     getJson('./agree_apply', function (res) {
                         console.log(res)
-                        sendmessage(_res.apply[0].aid, _res.apply[0].userid, '审批驳回');
-                        history.go(0)
-                    }, { id: res.spstatus[0].sid, isagree: 1 })
+                        sendmessage(_res.apply[0].aid, _res.apply[0].userid, username, '审批驳回');
+                        // history.go(0)
+                    }, { id: res.spstatus[0].sid, isagree: 2, applyid: res.apply[0].aid, etm: re_etm })
                 })
 
             } else if (res.spstatus.length == 3) {
@@ -163,33 +167,36 @@ $(document).ready(function () {
                 }
 
                 $('#urge').on('click', function () {
-                    str = 'http://jct.chease.cn' + '/my_list?applyid=' + res.apply[0].aid
-                    let url = 'http://h5.bibibaba.cn/send_qywx.php?touser=' + _userid
-                        + '&toparty=&totag=&'
-                        + 'title=用车申请&'
-                        + 'desc=' + _user.user.name + '的用车&'
-                        + 'url=' + str + '&remark=查看详情'
-                    // if (res.spstatus[0]) {
-                    W.ajax(url, {
-                        dataType: 'json',
-                        success: function (res) {
-                            // console.log(res)
-                            weui.alert('已催办')
-                        }
-                    })
+                    // str = 'http://jct.chease.cn' + '/my_list?applyid=' + res.apply[0].aid
+                    // let url = 'http://h5.bibibaba.cn/send_qywx.php?touser=' + _userid
+                    //     + '&toparty=&totag=&'
+                    //     + 'title=用车申请&'
+                    //     + 'desc=' + _user.user.name + '的用车&'
+                    //     + 'url=' + str + '&remark=查看详情'
+                    // // if (res.spstatus[0]) {
+                    // W.ajax(url, {
+                    //     dataType: 'json',
+                    //     success: function (res) {
+                    //         // console.log(res)
+                    //         weui.alert('已催办')
+                    //     }
+                    // })
+
+                    sendmessage(res.apply[0].aid, _userid, username, null, '已催办')
                     // }
                 })
+
 
                 $('#agree').on('click', function () {
                     // let etm = 
                     let _senid = res.apply[0].aid
                     getJson('./agree_apply', function (res) {
                         // console.log(res);
-                        history.go(0)
+                        // history.go(0)
                         if (_user.user.role != '局领导') {
-                            sendmessage(_senid, _userid)
+                            sendmessage(_senid, _userid, username)
                         } else if (_user.user.role == '局领导') {
-                            sendmessage(_senid, res.apply[0].userid, '审批通过')
+                            sendmessage(_senid, res.apply[0].userid, username, '审批通过')
                             // history.back();
                         }
 
@@ -197,12 +204,14 @@ $(document).ready(function () {
                     }, { id: _sid, isagree: 1 })
                 })
                 $('#reject').on('click', function () {
-                    let _senid = res.apply[0].aid
+                    let _senid = res.apply[0].aid;
+                    let re_etm = ~~(new Date().getTime() / 1000);
+
                     getJson('./agree_apply', function (res) {
                         // console.log(res);
-                        sendmessage(_senid, res.apply[0].userid, '审批驳回')
-                        history.go(0)
-                    }, { id: _sid, isagree: 1 })
+                        sendmessage(_senid, res.apply[0].userid, username, '审批驳回')
+                        // history.go(0)
+                    }, { id: _sid, isagree: 2, applyid: res.apply[0].aid, etm: re_etm })
                 })
 
                 if (_user.user.role == '科所队领导' || _user.user.role == '警务保障室领导' || _user.user.role == '局领导') {
@@ -222,9 +231,13 @@ $(document).ready(function () {
 
 
             let use_status = '';
+            let color_status = '';
             _status == 1 ? use_status = '已通过' : _status == 2 ? use_status = '已还车' : _status == 3 ? use_status = '驳回' : _status == 4 ? use_status = '已撤销' : use_status = '审核中';
-            $('#_spstatus').text(use_status);
-
+            _status == 1 ? color_status = '' : _status == 2 ? color_status = '' : _status == 3 ? color_status = 'no_agree' : _status == 4 ? color_status = 'back' : color_status = 'auditing';
+            let span_status = ` <span class="weui-badge great ${color_status} chang_f12" style="margin-left: 5px;" id="_spstatus">${use_status}</span>`
+            $('#_spstatus_1').empty();
+            $('#_spstatus_1').append(span_status);
+            // $('#_spstatus').addClass(color_status)
         })
 
 
@@ -259,7 +272,7 @@ $(document).ready(function () {
                 } else if (_g.my) {
                     $('#carlist_back').show();
                 }
-                if (res.cart[0].depart == '58'&&!_g.my) {
+                if (res.cart[0].depart == '58' && !_g.my) {
                     $('#back_carlist').show();
                 }
 
@@ -318,9 +331,6 @@ $(document).ready(function () {
                                 id: 'select_driver'
                             });
                         });
-
-
-
                     }, { depart: 58 })
 
                 }
@@ -339,75 +349,77 @@ $(document).ready(function () {
 
             getJson('up_applypc', function (re) {
                 // console.log(res)
-                sendmessage(res.apply[0].aid, res.apply[0].userid, '车队已派车')
+                sendmessage(res.apply[0].aid, res.apply[0].userid, username, '车队已派车')
             }, { car: car, driver: driver, id: res.apply[0].aid })
         })
 
 
         let _res = res
+        //撤销
         $('#backout').on('click', function () {
             let etm = ~~(new Date().getTime() / 1000)
             getJson('/up_apply', function (res) {
                 console.log(res)
                 // top.location
-                sendmessage(_res.apply[0].aid, _res.apply[0].userid, '还车成功')
-                history.go(0)
+                sendmessage(_res.apply[0].aid, _res.apply[0].userid, username, '撤销成功')
+
             }, { etm: etm, id: res.apply[0].aid })
         })
-
+        //车队还车
         $('#back_carlist').on('click', function () {
             let etm = ~~(new Date().getTime() / 1000)
             getJson('/up_apply', function (res) {
                 console.log(res)
-                // top.location
-                sendmessage(_res.apply[0].aid, _res.apply[0].userid, '还车成功')
+                sendmessage(_res.apply[0].aid, _res.apply[0].userid, username, '还车成功')
                 history.go(0)
             }, { etm: etm, id: res.apply[0].aid })
         })
-
+        //用于我还车
         $('#back_car').on('click', function () {
             let etm = ~~(new Date().getTime() / 1000)
             getJson('/up_apply', function (res) {
                 console.log(res)
                 // top.location
-                sendmessage(_res.apply[0].aid, _res.apply[0].userid, '还车成功')
-                history.go(0)
+                sendmessage(_res.apply[0].aid, _res.apply[0].userid, username, '还车成功')
+
             }, { etm: etm, id: res.apply[0].aid })
         })
+
         $('#carlist_back').on('click', function () {
-            // let etm = 
-            // getJson('./agree_apply', function () {
-            sendmessage(_res.apply[0].aid, '034237', '请还车');
-            weui.alert('已通知车队还车')
-
-            // }, { id: res.spstatus[0].sid, isagree: 1 })
+            sendmessage(_res.apply[0].aid, '034237', username, '请还车', '已通知车队还车');
         })
-        // $('#reject ').on('click', function () {
-
-        // }, { id: res.spstatus[0].sid, isagree: 2 })
-
-
-
     }
 
-    function sendmessage(id, userid, ti) {
+    function sendmessage(id, userid, name, ti, alt) {
         var titles = ti || '用车申请'
-        str = 'http://jct.chease.cn' + '/my_list?applyid=' + id
-        let url = 'http://h5.bibibaba.cn/send_qywx.php?touser=' + userid
-            + '&toparty=&totag=&'
-            + 'title=' + titles + '&'
-            + 'desc=' + _user.user.name + '的用车&'
-            + 'url=' + str + '&remark=查看详情'
-        // if (res.spstatus[0]) {
-        W.ajax(url, {
-            dataType: 'json',
-            success: function (res) {
-                console.log(res)
-                // weui.alert('已催办')
-                // history.back()
+        let str = 'http://jct.chease.cn' + '/my_list?applyid=' + id;
+        let _desc = name + '的用车'
+        let _op_data = { touser: userid, title: titles, desc: _desc, url: str, remark: "查看详情" };
+        $.ajax({
+            url: 'http://h5.bibibaba.cn/send_qywx.php',
+            data: _op_data,
+            dataType: 'jsonp',
+            crossDomain: true,
+            success: function (re) {
+                if (alt) {
+                    weui.alert(alt, function () {
+                        history.go(0);
+                    })
+                } else {
+                    history.go(0);
+                }
+            },
+            error: function (err) {
+                // console.log(err)
+                if (alt) {
+                    weui.alert(alt, function () {
+                        history.go(0);
+                    })
+                } else {
+                    history.go(0);
+                }
             }
         })
-        // }
     }
 })
 

@@ -86,6 +86,14 @@ check::before,check::after{
     color: #1D59B4;
     border: 1px solid #1D59B4;
 }
+.back {
+    color: #ccc;
+    border: 1px solid #ccc;
+}
+.no_agree {
+    color: #eb3535;
+    border: 1px solid #eb3535;
+}
 .chang_f12{
     font-size: 12px;
     -webkit-transform-origin-x: 0;

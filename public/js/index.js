@@ -32,7 +32,11 @@ $(document).ready(function () {
         if (_tab == 2) {
             getMyList()
         } else if (_tab == 1) {
-            getauditlist()
+            if (_tab1 == 0) {
+                get_no_auditList()
+            } else if (_tab1 == 1) {
+                getauditlist()
+            }
         } else if (_tab == 3) {
             if (_tab2 == 1) {
                 getdriver()
@@ -62,7 +66,12 @@ $(document).ready(function () {
             if (index == 2) {
                 getMyList()
             } else if (index == 1) {
-                getauditlist()
+                if (_tab1 == 0) {
+                    get_no_auditList()
+                } else if (_tab1 == 0) {
+                    getauditlist()
+                }
+
             } else if (index == 3) {
 
                 if (_tab2 == 1) {
@@ -77,6 +86,7 @@ $(document).ready(function () {
     function getMyList() {
         getJson('/get_applys', own_List, { uid: _user.user.id })
     }
+
     //列出提交列表
     function own_List(res) {
         console.log(res)
@@ -119,19 +129,20 @@ $(document).ready(function () {
                 }
             }
             let use_status = '';
+            let color_status = '';
             _status == 1 ? use_status = '已通过' : _status == 2 ? use_status = '已还车' : _status == 3 ? use_status = '驳回' : _status == 4 ? use_status = '已撤销' : use_status = '审核中';
+            _status == 1 ? color_status = '' : _status == 2 ? color_status = '' : _status == 3 ? color_status = 'no_agree' : _status == 4 ? color_status = 'back' : color_status = 'auditing';
             let date = W.dateToString(new Date(parseInt(ele.cre_tm) * 1000))
-            let str_content = ` <a class="weui-cell weui-cell_access p_0 b_b_1" href="` + _href + `">
+            let str_content = ` <a class="weui-cell weui-cell_access p_0 b_b_1" href="${_href}">
             <div class="f14 w_100">
                 <div class="weui-media-box weui-media-box_text">
                     <div class="weui-flex">
                         <h4 class=" weui-flex__item weui-media-box__title f_w_7">
                             <span style="vertical-align: middle">用车</span>
-                            <span class="weui-badge great auditing chang_f12" style="margin-left: 5px;">`+ use_status + `</span>
+                            <span class="weui-badge great ${color_status}  chang_f12" style="margin-left: 5px;">${use_status}</span>
                         </h4>
-                        <div class="weui-flex__item t_a_r">`+ date + `</div>
+                        <div class="weui-flex__item t_a_r">${date}</div>
                     </div>
-
                     <div class="weui-flex ">
                         <div class="weui-flex__item">
                             <div class="weui-cell p_0">
@@ -139,7 +150,7 @@ $(document).ready(function () {
                                     <p class="c_9">事由</p>
                                 </div>
                                 <div class="weui-cell__bd">
-                                    <p>`+ ele.days + `</p>
+                                    <p>${ele.days}</p>
                                 </div>
                             </div>
                         </div>
@@ -154,6 +165,10 @@ $(document).ready(function () {
     //获取审核列表
     function getauditlist() {
         getJson('/audit_list', audit_list, { uid: _user.user.id })
+    }
+
+    function get_no_auditList() {
+        getJson('/no_audit_list', audit_list, { uid: _user.user.id })
     }
     //筛选审核列表
     function audit_list(res) {
@@ -216,7 +231,7 @@ $(document).ready(function () {
                     if (ele.spstatus[0].isagree == 2) {
                         _status = 3;
                     }
-                    if (ele.spstatus[0].isagree && ele.etm > 0) {
+                    if (!ele.spstatus[0].isagree && ele.etm > 0) {
                         _status = 4;
                     }
                     if (_user.user.role == '科所队领导') {
@@ -254,21 +269,23 @@ $(document).ready(function () {
                     }
                 }
                 let use_status = '';
+                let color_status = '';
                 _status == 1 ? use_status = '已通过' : _status == 2 ? use_status = '已还车' : _status == 3 ? use_status = '驳回' : _status == 4 ? use_status = '已撤销' : use_status = '审核中';
+                _status == 1 ? color_status = '' : _status == 2 ? color_status = '' : _status == 3 ? color_status = 'no_agree' : _status == 4 ? color_status = 'back' : color_status = 'auditing';
                 if (_user.user.role == '管理员') {
                     level_show = true;
                 }
                 let date = W.dateToString(new Date(parseInt(ele.cre_tm) * 1000))
                 if (level_show) {
-                    let str_content = ` <a class="weui-cell weui-cell_access p_0 b_b_1" href="` + _href + `">
+                    let str_content = ` <a class="weui-cell weui-cell_access p_0 b_b_1" href="${_href}">
                     <div class="f14 w_100">
                         <div class="weui-media-box weui-media-box_text">
                             <div class="weui-flex">
                                 <h4 class=" weui-flex__item weui-media-box__title f_w_7">
-                                    <span style="vertical-align: middle">`+ name + `</span>
-                                    <span class="weui-badge great auditing chang_f12" style="margin-left: 5px;">`+ use_status + `</span>
+                                    <span style="vertical-align: middle">${name}</span>
+                                    <span class="weui-badge great ${color_status} chang_f12" style="margin-left: 5px;">${use_status}</span>
                                 </h4>
-                                <div class="weui-flex__item t_a_r">`+ date + `</div>
+                                <div class="weui-flex__item t_a_r">${date}</div>
                             </div>
         
                             <div class="weui-flex ">
@@ -278,7 +295,7 @@ $(document).ready(function () {
                                             <p class="c_9">事由</p>
                                         </div>
                                         <div class="weui-cell__bd">
-                                            <p>`+ ele.days + `</p>
+                                            <p>${ele.days}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -338,12 +355,20 @@ $(document).ready(function () {
             });
         });
     }
+
+    //审核已处理和未处理
     tab('#tab1', {
         defaultIndex: _tab1,
         onChange: function (index) {
+            console.log(index, 'index')
             sessionStorage.setItem('tab1', index);
             _tab1 = index;
-            getauditlist();
+            if (index == 0) {
+                get_no_auditList();
+            } else if (index == 1) {
+                getauditlist();
+            }
+
         }
     });
 
@@ -401,7 +426,7 @@ $(document).ready(function () {
         });
     }
     tab1('#tab2', {
-        defaultIndex: 0,
+        defaultIndex: _tab2,
         onChange: function (index) {
             console.log(index)
             _tab2 = index;
@@ -458,18 +483,20 @@ $(document).ready(function () {
                     }
                 }
                 let use_status = '';
+                let color_status = '';
+                _status == 1 ? color_status = '' : _status == 2 ? color_status = '' : _status == 3 ? color_status = 'no_agree' : _status == 4 ? color_status = 'back' : color_status = 'auditing';
                 _status == 1 ? use_status = '已通过' : _status == 2 ? use_status = '已还车' : _status == 3 ? use_status = '驳回' : _status == 4 ? use_status = '已撤销' : use_status = '审核中';
                 let date = W.dateToString(new Date(parseInt(ele.cre_tm) * 1000));
                 let name = ele.name
-                let str_content = ` <a class="weui-cell weui-cell_access p_0 b_b_1" href="` + _href + `">
+                let str_content = ` <a class="weui-cell weui-cell_access p_0 b_b_1" href="${_href}">
                 <div class="f14 w_100">
                     <div class="weui-media-box weui-media-box_text">
                         <div class="weui-flex">
                             <h4 class=" weui-flex__item weui-media-box__title f_w_7">
-                                <span style="vertical-align: middle">`+ name + `的用车</span>
-                                <span class="weui-badge great auditing chang_f12" style="margin-left: 5px;">`+ use_status + `</span>
+                                <span style="vertical-align: middle">${name}的用车</span>
+                                <span class="weui-badge great ${color_status} chang_f12" style="margin-left: 5px;">${use_status}</span>
                             </h4>
-                            <div class="weui-flex__item t_a_r">`+ date + `</div>
+                            <div class="weui-flex__item t_a_r">${date}</div>
                         </div>
         
                         <div class="weui-flex ">
@@ -479,7 +506,7 @@ $(document).ready(function () {
                                         <p class="c_9">事由</p>
                                     </div>
                                     <div class="weui-cell__bd">
-                                        <p>`+ ele.days + `</p>
+                                        <p>${ele.days}</p>
                                     </div>
                                 </div>
                             </div>
@@ -537,18 +564,20 @@ $(document).ready(function () {
                     }
                 }
                 let use_status = '';
+                let color_status = '';
+                _status == 1 ? color_status = '' : _status == 2 ? color_status = '' : _status == 3 ? color_status = 'no_agree' : _status == 4 ? color_status = 'back' : color_status = 'auditing';
                 _status == 1 ? use_status = '已通过' : _status == 2 ? use_status = '已还车' : _status == 3 ? use_status = '驳回' : _status == 4 ? use_status = '已撤销' : use_status = '审核中';
                 let date = W.dateToString(new Date(parseInt(ele.cre_tm) * 1000));
                 let name = ele.name
-                let str_content = ` <a class="weui-cell weui-cell_access p_0 b_b_1" href="` + _href + `">
+                let str_content = ` <a class="weui-cell weui-cell_access p_0 b_b_1" href="${_href}">
                 <div class="f14 w_100">
                     <div class="weui-media-box weui-media-box_text">
                         <div class="weui-flex">
                             <h4 class=" weui-flex__item weui-media-box__title f_w_7">
-                                <span style="vertical-align: middle">`+ name + `的用车</span>
-                                <span class="weui-badge great auditing chang_f12" style="margin-left: 5px;">`+ use_status + `</span>
+                                <span style="vertical-align: middle">${name}的用车</span>
+                                <span class="weui-badge great ${color_status} chang_f12" style="margin-left: 5px;">${use_status}</span>
                             </h4>
-                            <div class="weui-flex__item t_a_r">`+ date + `</div>
+                            <div class="weui-flex__item t_a_r">${date}</div>
                         </div>
         
                         <div class="weui-flex ">
@@ -558,7 +587,7 @@ $(document).ready(function () {
                                         <p class="c_9">事由</p>
                                     </div>
                                     <div class="weui-cell__bd">
-                                        <p>`+ ele.days + `</p>
+                                        <p>${ele.days}</p>
                                     </div>
                                 </div>
                             </div>
