@@ -274,36 +274,46 @@ router.get('/get_applys', function (req, res, next) {
 })
 
 
-//获取我审核的列表
+//获取我已处理审核的列表
 router.get('/audit_list', function (req, res, next) {
     var db = req.con;
     var query = req.query;
-    var str = 'select a.*,b.* from (select *,ga_spstatus.id as sid,ga_spstatus.uid as suid,ga_spstatus.status as sstatus,ga_spstatus.cre_tm as scre_tm  from ga_spstatus where uid = ' + query.uid + ' and isagree > 0) as a left join ga_apply as b on a.apply_id = b.id order by a.id desc'
+    let cpage1 = query.currentPage * query.pageSize;
+    let cpage2 = query.pageSize;
+    // let psize = query.pageSize;
+
+    var str = 'select a.*,b.* from (select *,ga_spstatus.id as sid,ga_spstatus.uid as suid,ga_spstatus.status as sstatus,ga_spstatus.cre_tm as scre_tm  from ga_spstatus where uid = ' + query.uid + ' and isagree > 0) as a left join ga_apply as b on a.apply_id = b.id order by a.id desc limit ' + cpage1 + ',' + cpage2;
     // var str = 'select * from ga_spstatus where uid = ' + query.uid
+    console.log(str)
     let _index = 0;
     db.query(str, function (err, rows) {
         console.log(err, rows, query);
-        let data = rows;
-        data.forEach((ele, index) => {
-            console.log(_index)
-            if (ele.id) {
-                let str1 = 'select * from ga_spstatus where apply_id = ' + ele.id + ' order by status';
-                db.query(str1, function (err, rowss) {
+        let data = rows || [];
+        if (data.length) {
+            data.forEach((ele, index) => {
+                console.log(_index)
+                if (ele.id) {
+                    let str1 = 'select * from ga_spstatus where apply_id = ' + ele.id + ' order by status';
+                    db.query(str1, function (err, rowss) {
+                        _index++;
+                        // console.log(str1, _index)
+                        ele.spstatus = rowss;
+                        if (data.length == _index) {
+                            res.json(data);
+                        }
+                    })
+                } else {
                     _index++;
-                    // console.log(str1, _index)
-                    ele.spstatus = rowss;
                     if (data.length == _index) {
-                        res.json(rows);
+                        res.json(data);
                     }
-                })
-            } else {
-                _index++;
-                if (rows.length == _index) {
-                    res.json(rows);
                 }
-            }
-        })
-        // res.json(rows)
+            })
+        } else {
+            res.json(data)
+        }
+
+        // 
     })
 })
 
@@ -311,32 +321,38 @@ router.get('/audit_list', function (req, res, next) {
 router.get('/no_audit_list', function (req, res, next) {
     var db = req.con;
     var query = req.query;
-    var str = 'select a.*,b.* from (select *,ga_spstatus.id as sid,ga_spstatus.uid as suid,ga_spstatus.status as sstatus,ga_spstatus.cre_tm as scre_tm  from ga_spstatus where uid = ' + query.uid + ' and isagree = 0) as a left join ga_apply as b on a.apply_id = b.id order by a.id desc'
+    let cpage1 = query.currentPage * query.pageSize;
+    let cpage2 = query.pageSize;
+    var str = 'select a.*,b.* from (select *,ga_spstatus.id as sid,ga_spstatus.uid as suid,ga_spstatus.status as sstatus,ga_spstatus.cre_tm as scre_tm  from ga_spstatus where uid = ' + query.uid + ' and isagree = 0) as a left join ga_apply as b on a.apply_id = b.id order by a.id desc limit ' + cpage1 + ',' + cpage2;
     // var str = 'select * from ga_spstatus where uid = ' + query.uid
     let _index = 0;
     db.query(str, function (err, rows) {
         console.log(err, rows, query);
         let data = rows;
-        data.forEach((ele, index) => {
-            console.log(_index)
-            if (ele.id) {
-                let str1 = 'select * from ga_spstatus where apply_id = ' + ele.id + ' order by status';
-                db.query(str1, function (err, rowss) {
+        if (data.length) {
+            data.forEach((ele, index) => {
+                console.log(_index)
+                if (ele.id) {
+                    let str1 = 'select * from ga_spstatus where apply_id = ' + ele.id + ' order by status';
+                    db.query(str1, function (err, rowss) {
+                        _index++;
+                        // console.log(str1, _index)
+                        ele.spstatus = rowss;
+                        if (data.length == _index) {
+                            res.json(rows);
+                        }
+                    })
+                } else {
                     _index++;
-                    // console.log(str1, _index)
-                    ele.spstatus = rowss;
-                    if (data.length == _index) {
+                    if (rows.length == _index) {
                         res.json(rows);
                     }
-                })
-            } else {
-                _index++;
-                if (rows.length == _index) {
-                    res.json(rows);
                 }
-            }
-        })
-        // res.json(rows)
+            })
+        } else {
+            res.json(data)
+        }
+        // 
     })
 })
 

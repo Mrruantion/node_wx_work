@@ -8,6 +8,15 @@ $(document).ready(function () {
     _tab1 = sessionStorage.getItem('tab1') || 0;
     _tab2 = sessionStorage.getItem('tab2') || 0;
 
+    let currentPage = 0,
+        pageSize = 5;
+
+
+    let w_audited = [],
+        w_auditing = [],
+        w_commit = [],
+        show_more = true;
+
 
     var _user = null;
     function getJson(url, callback, option, type) {
@@ -63,6 +72,7 @@ $(document).ready(function () {
             sessionStorage.setItem('tab', index);
             console.log(index, 1);
             _tab = index;
+            currentPage = 0;
             if (index == 2) {
                 getMyList()
             } else if (index == 1) {
@@ -164,15 +174,18 @@ $(document).ready(function () {
 
     //获取审核列表
     function getauditlist() {
-        getJson('/audit_list', audit_list, { uid: _user.user.id })
+        getJson('/audit_list', audit_list, { uid: _user.user.id, pageSize: pageSize, currentPage: currentPage })
     }
 
     function get_no_auditList() {
-        getJson('/no_audit_list', audit_list, { uid: _user.user.id })
+        getJson('/no_audit_list', audit_list, { uid: _user.user.id, pageSize: pageSize, currentPage: currentPage })
     }
     //筛选审核列表
     function audit_list(res) {
         // console.log(res)
+        if (res.length < pageSize) {
+            show_more = false;
+        }
         let audited = [];
         let auditing = [];
         res.forEach((ele, index) => {
@@ -183,9 +196,11 @@ $(document).ready(function () {
             }
         })
         if (_tab1 == 1) {
-            showAudit(audited, 1)
+            w_audited = w_audited.concat(audited);
+            showAudit(w_audited, 1)
         } else {
-            showAudit(auditing, 2)
+            w_audited = w_auditing.concat(auditing);
+            showAudit(w_audited, 2)
         }
 
     }
@@ -310,6 +325,26 @@ $(document).ready(function () {
             }
 
         })
+        let more_content = `
+                <a class="weui-cell weui-cell_access" href="javascript:;" id="changeCPage">
+                <div class="f14 w_100">
+                    <div class="t_a_c">
+                        更多···
+                    </div>
+                </div>
+            </a>
+            `;
+
+        if (show_more) {
+            type == 1 ? $('#_audited').append(more_content) : $('#_auditing').append(more_content)
+        }
+        $("#changeCPage").on('click', function () {
+            console.log(currentPage);
+            currentPage++;
+            if (_tab1 == 1) {
+                getauditlist();
+            }
+        })
     }
 
 
@@ -363,9 +398,12 @@ $(document).ready(function () {
             console.log(index, 'index')
             sessionStorage.setItem('tab1', index);
             _tab1 = index;
+            currentPage = 0;
             if (index == 0) {
+                w_auditing = [];
                 get_no_auditList();
             } else if (index == 1) {
+                w_audited = [];
                 getauditlist();
             }
 
@@ -438,9 +476,7 @@ $(document).ready(function () {
             }
         }
     });
-
-
-
+    
     function showcarlist(res) {
         console.log(res);
         $('#ss11').empty();
