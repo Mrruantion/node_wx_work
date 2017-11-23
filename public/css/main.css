@@ -290,3 +290,17 @@ check::before,check::after{
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 }
+
+
+
+/*fix*/
+.wxlx {
+    padding: 10px 15px;
+    position: relative;
+    /* display: -webkit-box; */
+    /* display: -webkit-flex; */
+    /* display: flex; */
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+}

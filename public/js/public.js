@@ -5,7 +5,7 @@ function W(select, needAll) {
         return document.querySelector(select);
 }
 
-
+W.noop = function () { };
 W.setCookie = function (c_name, value, expiredays, path) {
     var exdate = new Date();
     expiredays = expiredays || 1; //默认为1天
