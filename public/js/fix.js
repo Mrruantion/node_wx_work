@@ -4,7 +4,17 @@ $(document).ready(function () {
 
     getAudit(_val)
 
-    console.log(_user)
+    W.ajax('/fix_apply/code_king', {
+        success: function (res) {
+            console.log(res)
+        }
+    })
+    W.ajax('/fix_apply/get_repairinfo', {
+        success: function (res) {
+            console.log(res)
+        }
+    })
+    // console.log(_user)
 
 
     //进厂日期
@@ -75,6 +85,16 @@ $(document).ready(function () {
     $('#add_repairInfo').on('click', function () {
         $('#container').hide();
         $('#repair_info').show();
+        var state = { 'page_id': 1, 'user_id': 5 };
+        var title = '添加明细';
+        var url = 'fix_apply#add_repair';
+        history.pushState(state, title, url);
+        window.addEventListener('popstate', function (e) {
+            // console.log(e);
+            $('#container').show();
+            $('#repair_info').hide();
+        });
+
     })
 
 

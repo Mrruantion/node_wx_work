@@ -54,6 +54,8 @@ $(document).ready(function () {
                 _spstatus[1] = ele
             } else if (ele.role == '局领导') {
                 _spstatus[2] = ele
+            } else if (ele.role == '管理员') {
+                _spstatus[0] = ele
             }
         })
         res.spstatus = _spstatus;
@@ -393,6 +395,9 @@ $(document).ready(function () {
     function sendmessage(id, userid, name, ti, alt) {
         var titles = ti || '用车申请'
         let str = 'http://jct.chease.cn' + '/my_list?applyid=' + id;
+        if (alt) {
+            str += '&my=true'
+        }
         let _desc = name + '的用车'
         let _op_data = { touser: userid, title: titles, desc: _desc, url: str, remark: "查看详情" };
         $.ajax({

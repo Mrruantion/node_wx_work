@@ -47,4 +47,29 @@ router.get('/getaudit', function (req, res, next) {
         res.json(result)
     })
 })
+
+
+router.get('/code_king', function (req, res, next) {
+    var db = req.con;
+    var query = req.query;
+    var str = 'select * from code_enum where KIND >= 0';
+    var str1 = 'select * from code_enum_kind where KIND >= 0';
+    let code = {};
+    db.query(str, function (err, rows) {
+        code.enum = rows;
+        db.query(str1, function (error, rowss) {
+            code.enum_kind = rowss;
+            res.json(code)
+        })
+    })
+})
+
+router.get('/get_repairinfo', function (req, res, next) {
+    var db = req.con;
+    var query = req.query;
+    var str = 'select * from ga_repairinfo where ID >= 0 '
+    db.query(str, function (err, rows) {
+        res.json(rows)
+    })
+})
 module.exports = router;

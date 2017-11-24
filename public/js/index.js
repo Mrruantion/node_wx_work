@@ -17,6 +17,7 @@ $(document).ready(function () {
         w_commit = [],
         show_more = true;
 
+    let all_audits = [];
 
     var _user = null;
     function getJson(url, callback, option, type) {
@@ -38,6 +39,7 @@ $(document).ready(function () {
         console.log(res, 'dfdfdf')
         localStorage.setItem('user', JSON.stringify(res));
         _user = res;
+        getJson('/search_audit_list', search, { uid: _user.user.id })
         if (_tab == 2) {
             getMyList()
         } else if (_tab == 1) {
@@ -101,75 +103,80 @@ $(document).ready(function () {
     function own_List(res) {
         console.log(res)
         $('#own_list').empty();
-        res.forEach((ele, index) => {
-            let _href = './my_list?applyid=' + ele.id + '&my=' + true;
-            let _status = 0;
-            console.log(index)
-            if (ele.spstatus.length == 1) {
-                if (ele.spstatus[0].isagree == 1) {
-                    _status = 1;
-                    if (ele.etm) {
-                        _status = 2;
+        res = res || [];
+        if (res.length) {
+            res.forEach((ele, index) => {
+                let _href = './my_list?applyid=' + ele.id + '&my=' + true;
+                let _status = 0;
+                let name = ele.name
+                console.log(index)
+                if (ele.spstatus.length == 1) {
+                    if (ele.spstatus[0].isagree == 1) {
+                        _status = 1;
+                        if (ele.etm) {
+                            _status = 2;
+                        }
+                    } else {
+                        _status = 0;
                     }
-                } else {
-                    _status = 0;
-                }
-                if (ele.spstatus[0].isagree == 2) {
-                    _status = 3;
-                }
-                if (!ele.spstatus[0].isagree && ele.etm > 0) {
-                    _status = 4;
-                }
-            } else if (ele.spstatus.length == 3) {
-
-                if (ele.spstatus[0].isagree == 1 && ele.spstatus[1].isagree == 1 && ele.spstatus[2].isagree == 1) {
-                    _status = 1;
-                    if (ele.etm) {
-                        _status = 2;
+                    if (ele.spstatus[0].isagree == 2) {
+                        _status = 3;
                     }
-                } else {
-                    _status = 0;
-                }
+                    if (!ele.spstatus[0].isagree && ele.etm > 0) {
+                        _status = 4;
+                    }
+                } else if (ele.spstatus.length == 3) {
 
-                if (ele.spstatus[0].isagree == 2 || ele.spstatus[1].isagree == 2 || ele.spstatus[2].isagree == 2) {
-                    _status = 3;
+                    if (ele.spstatus[0].isagree == 1 && ele.spstatus[1].isagree == 1 && ele.spstatus[2].isagree == 1) {
+                        _status = 1;
+                        if (ele.etm) {
+                            _status = 2;
+                        }
+                    } else {
+                        _status = 0;
+                    }
+
+                    if (ele.spstatus[0].isagree == 2 || ele.spstatus[1].isagree == 2 || ele.spstatus[2].isagree == 2) {
+                        _status = 3;
+                    }
+                    if ((!ele.spstatus[0].isagree || !ele.spstatus[1].isagree || !ele.spstatus[2].isagree) && ele.etm > 0) {
+                        _status = 4;
+                    }
                 }
-                if ((!ele.spstatus[0].isagree || !ele.spstatus[1].isagree || !ele.spstatus[2].isagree) && ele.etm > 0) {
-                    _status = 4;
-                }
-            }
-            let use_status = '';
-            let color_status = '';
-            _status == 1 ? use_status = '已通过' : _status == 2 ? use_status = '已还车' : _status == 3 ? use_status = '驳回' : _status == 4 ? use_status = '已撤销' : use_status = '审核中';
-            _status == 1 ? color_status = '' : _status == 2 ? color_status = '' : _status == 3 ? color_status = 'no_agree' : _status == 4 ? color_status = 'back' : color_status = 'auditing';
-            let date = W.dateToString(new Date(parseInt(ele.cre_tm) * 1000))
-            let str_content = ` <a class="weui-cell weui-cell_access p_0 b_b_1" href="${_href}">
-            <div class="f14 w_100">
-                <div class="weui-media-box weui-media-box_text">
-                    <div class="weui-flex">
-                        <h4 class=" weui-flex__item weui-media-box__title f_w_7">
-                            <span style="vertical-align: middle">用车</span>
-                            <span class="weui-badge great ${color_status}  chang_f12" style="margin-left: 5px;">${use_status}</span>
-                        </h4>
-                        <div class="weui-flex__item t_a_r">${date}</div>
-                    </div>
-                    <div class="weui-flex ">
-                        <div class="weui-flex__item">
-                            <div class="weui-cell p_0">
-                                <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                                    <p class="c_9">事由</p>
-                                </div>
-                                <div class="weui-cell__bd">
-                                    <p>${ele.days}</p>
+                let use_status = '';
+                let color_status = '';
+                _status == 1 ? use_status = '已通过' : _status == 2 ? use_status = '已还车' : _status == 3 ? use_status = '驳回' : _status == 4 ? use_status = '已撤销' : use_status = '审核中';
+                _status == 1 ? color_status = '' : _status == 2 ? color_status = '' : _status == 3 ? color_status = 'no_agree' : _status == 4 ? color_status = 'back' : color_status = 'auditing';
+                let date = W.dateToString(new Date(parseInt(ele.cre_tm) * 1000))
+                let str_content = ` <a class="weui-cell weui-cell_access p_0 b_b_1" href="${_href}">
+                <div class="f14 w_100">
+                    <div class="weui-media-box weui-media-box_text">
+                        <div class="weui-flex">
+                            <h4 class=" weui-flex__item weui-media-box__title f_w_7">
+                                <span style="vertical-align: middle">${name}用车</span>
+                                <span class="weui-badge great ${color_status}  chang_f12" style="margin-left: 5px;">${use_status}</span>
+                            </h4>
+                            <div class="weui-flex__item t_a_r">${date}</div>
+                        </div>
+                        <div class="weui-flex ">
+                            <div class="weui-flex__item">
+                                <div class="weui-cell p_0">
+                                    <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
+                                        <p class="c_9">事由</p>
+                                    </div>
+                                    <div class="weui-cell__bd">
+                                        <p>${ele.days}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </a>`
-            $('#own_list').append(str_content);
-        })
+            </a>`
+                $('#own_list').append(str_content);
+            })
+        }
+
     }
 
     //获取审核列表
@@ -185,6 +192,8 @@ $(document).ready(function () {
         // console.log(res)
         if (res.length < pageSize) {
             show_more = false;
+        } else {
+            show_more = true;
         }
         let audited = [];
         let auditing = [];
@@ -476,7 +485,7 @@ $(document).ready(function () {
             }
         }
     });
-    
+
     function showcarlist(res) {
         console.log(res);
         $('#ss11').empty();
@@ -637,5 +646,57 @@ $(document).ready(function () {
         })
 
 
+    }
+
+
+
+    $('#search_list2').on('input', function () {
+        // console.log('hello')
+        // console.log(this.value)
+        getJson('/search_apply', own_List, { uid: _user.user.id, search: this.value })
+    })
+
+    $('#search_list1').on('input', function () {
+        audit_filter(this.value)
+        //     getJson('/search_audit_list', search, { uid: _user.user.id, search: this.value })
+        // console.log(all_audits)
+
+
+
+    })
+    function audit_filter(res) {
+        let ss = [];
+        show_more = false;
+        if (!res) {
+            show_more = true;
+            w_audited = [];
+            w_auditing = []
+        }
+        if (_tab1 == 0) {
+            if (res) {
+                ss = all_audits.filter(s1 => s1.isagree == 0 && (s1.name.includes(res) || s1.days.includes(res)))
+                showAudit(w_audited, 2)
+            } else {
+
+                get_no_auditList();
+            }
+
+        } else if (_tab1 == 1) {
+            if (res) {
+                ss = all_audits.filter(s2 => s2.isagree > 0 && (s2.name.includes(res) || s2.days.includes(res)))
+                showAudit(ss, 1)
+
+            } else {
+                // show_more = true
+                getauditlist()
+            }
+
+        }
+
+    }
+    function search(res) {
+        // console.log(res)
+        res = res.filter(ele => ele.name)
+        all_audits = res;
     }
 })

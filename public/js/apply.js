@@ -606,31 +606,64 @@ $(document).ready(function () {
         getJson('/add_apply', function (res) {
             // console.log(res)
             weui.alert('提交成功', function () {
-                sendmessage(res, apend_data[0].userid)
-                top.location = '/my_list?applyid=' + res + '&my=true'
+                sendmessage(res, apend_data[0].userid, _user.user.name)
+                
             });
         }, push_op)
 
 
 
     });
-    function sendmessage(id, userid, t) {
-        var titles = t || '用车申请'
-        str = 'http://jct.chease.cn' + '/my_list?applyid=' + id
-        let url = 'http://h5.bibibaba.cn/send_qywx.php?touser=' + userid
-            + '&toparty=&totag=&'
-            + 'title=' + titles + '&'
-            + 'desc=' + _user.user.name + '的用车&'
-            + 'url=' + str + '&remark=查看详情'
-        // if (res.spstatus[0]) {
-        W.ajax(url, {
-            dataType: 'json',
-            success: function (res) {
-                // console.log(res)
-                // weui.alert('已催办')
-                history.back()
+    // function sendmessage(id, userid, t) {
+    //     var titles = t || '用车申请'
+    //     str = 'http://jct.chease.cn' + '/my_list?applyid=' + id
+    //     let url = 'http://h5.bibibaba.cn/send_qywx.php?touser=' + userid
+    //         + '&toparty=&totag=&'
+    //         + 'title=' + titles + '&'
+    //         + 'desc=' + _user.user.name + '的用车&'
+    //         + 'url=' + str + '&remark=查看详情'
+    //     // if (res.spstatus[0]) {
+    //     W.ajax(url, {
+    //         dataType: 'json',
+    //         success: function (res) {
+    //             // console.log(res)
+    //             // weui.alert('已催办')
+    //             history.back()
+    //         }
+    //     })
+    //     // }
+    // }
+    function sendmessage(id, userid, name, ti, alt) {
+        var titles = ti || '用车申请'
+        let str = 'http://jct.chease.cn' + '/my_list?applyid=' + id;
+        let _desc = name + '的用车'
+        let _op_data = { touser: userid, title: titles, desc: _desc, url: str, remark: "查看详情" };
+        $.ajax({
+            url: 'http://h5.bibibaba.cn/send_qywx.php',
+            data: _op_data,
+            dataType: 'jsonp',
+            crossDomain: true,
+            success: function (re) {
+                // if (alt) {
+                //     weui.alert(alt, function () {
+                //         history.go(0);
+                //     })
+                // } else {
+                //     history.go(0);
+                // }
+                top.location = '/my_list?applyid=' + res + '&my=true'
+            },
+            error: function (err) {
+                // console.log(err)
+                // if (alt) {
+                //     weui.alert(alt, function () {
+                //         history.go(0);
+                //     })
+                // } else {
+                //     history.go(0);
+                // }
+                top.location = '/my_list?applyid=' + res + '&my=true'
             }
         })
-        // }
     }
 });

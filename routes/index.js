@@ -217,15 +217,16 @@ router.get('/getapply_list', function (req, res, next) {
     // let sql = ' select * from ga_apply where id = ' + query.applyid 
     let _r_o = {};
     db.query(sql, function (err, row) {
-        console.log(row);
+        console.log(row, 1);
         _r_o.apply = row;
 
         // let sql2 = 'select * from ga_spstatus where apply_id = ' + query.applyid;
         let sql2 = "select a.*,b.* from (select * ,ga_spstatus.id As sid,ga_spstatus.status As sstatus from ga_spstatus where apply_id = " + query.applyid + ") as a left join ga_user as b on a.uid = b.id";
-        console.log(sql2)
+        console.log(sql2, 2)
         db.query(sql2, function (err, rows) {
-            console.log(err, row);
+            console.log(err, rows, 'ddfd');
             let sql3 = 'select * from ga_cart where name = "' + row[0].car_num + '"';
+            // console.log()
             _r_o.spstatus = rows;
 
             if (row[0].car_num) {
@@ -427,7 +428,7 @@ router.get('/getdriver', function (req, res, next) {
     var query = req.query;
     var db = req.con;
     var query = req.query;
-    var str = 'select * from ga_apply where driver = 3 order by id desc ';
+    var str = 'select * from ga_apply where driver = 3 and etm = 0 order by id desc ';
     db.query(str, function (err, rows) {
         console.log(rows, '')
         let data = rows || [];
@@ -482,6 +483,92 @@ router.get('/up_applypc', function (req, res, next) {
     db.query(str, function (err, ros) {
         console.log(err)
         res.json(ros)
+    })
+})
+
+
+//搜索已提交列表
+router.get('/search_apply', function (req, res, next) {
+    var db = req.con;
+    var query = req.query;
+    var str = 'select * from ga_apply where uid = ' + query.uid + ' order by id desc ';
+    if (query.search) {
+        // str = 'select * from ga_apply where ( name like %"' + query.search + '"% or days like %"' + query.search + '"% ) and uid = ' + query.uid + '  order by id desc ';
+        str = 'select * from ga_apply where ( uid = ' + query.uid + ' and name like "%' + query.search + '%" ) or ( uid = ' + query.uid + ' and days like "%' + query.search + '%" ) order by id desc '
+        // str = 'select * from ga_apply where name like "' + query.search + '%"'
+    }
+    console.log(str)
+    db.query(str, function (err, rows) {
+        console.log(rows, '')
+        let data = rows || [];
+        if (data.length >= 1) {
+            let i = 0;
+            data.forEach((ele, index) => {
+                var str2 = 'select * from ga_spstatus where apply_id = ' + ele.id + ' order by status';
+                db.query(str2, function (error, row) {
+                    i++;
+                    console.log(i, 'i', typeof row)
+                    console.log(str2, error, index, i)
+                    ele.spstatus = row || [];
+                    if (data.length == i) {
+                        res.json(data);
+                    }
+                })
+            })
+        } else {
+            res.json(data)
+        }
+    })
+})
+
+//搜索已审核列表
+router.get('/search_audit_list', function (req, res, next) {
+    var db = req.con;
+    var query = req.query;
+    let cpage1 = query.currentPage * query.pageSize;
+    let cpage2 = query.pageSize;
+    // let psize = query.pageSize;
+
+    var str = 'select a.*,b.* from (select *,ga_spstatus.id as sid,ga_spstatus.uid as suid,ga_spstatus.status as sstatus,ga_spstatus.cre_tm as scre_tm  from ga_spstatus where uid = ' + query.uid + ' ) as a left join ga_apply as b on a.apply_id = b.id order by a.id desc';
+    // if (query.search) {
+        // str = 'select a.*,b.* from (select *,ga_spstatus.id as sid,ga_spstatus.uid as suid,ga_spstatus.status as sstatus,ga_spstatus.cre_tm as scre_tm  from ga_spstatus where uid = ' + query.uid + ' and isagree > 0) as a left join (select * from ga_apply where name like "%' + query.search + '%"  or days like "%' + query.search + '%" ) as b on a.apply_id = b.id order by a.id desc'
+        // str = 'select a.*,b.* from (select * from ga_apply where name like "%' + query.search + '%"  or days like "%' + query.search + '%" )  as a left join (select *,ga_spstatus.id as sid,ga_spstatus.uid as suid,ga_spstatus.status as sstatus,ga_spstatus.cre_tm as scre_tm  from ga_spstatus where uid = ' + query.uid + ' and isagree > 0) as b on a.id = b.apply_id order by a.id desc'
+    // }
+
+
+    // var str = 'select * from ga_spstatus where uid = ' + query.uid
+    console.log(str)
+    let _index = 0;
+    db.query(str, function (err, rows) {
+        console.log(err, rows, query);
+        let data = rows || [];
+        data = data.filter(ele => ele.suid == query.uid)
+        console.log(data.length)
+        if (data.length) {
+            data.forEach((ele, index) => {
+                console.log(_index)
+                if (ele.id) {
+                    let str1 = 'select * from ga_spstatus where apply_id = ' + ele.id + ' order by status';
+                    db.query(str1, function (err, rowss) {
+                        _index++;
+                        // console.log(str1, _index)
+                        ele.spstatus = rowss;
+                        if (data.length == _index) {
+                            res.json(data);
+                        }
+                    })
+                } else {
+                    _index++;
+                    if (data.length == _index) {
+                        res.json(data);
+                    }
+                }
+            })
+        } else {
+            res.json(data)
+        }
+
+        // 
     })
 })
 
