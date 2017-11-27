@@ -178,6 +178,9 @@
             </div>
         </div>
 
+        <div class="clli" id="show_clli">
+           
+        </div>
 
         <div>
             <div class="m_15">
@@ -186,18 +189,18 @@
             <div class="m_15">
                 <a href="javascript:;" class="weui-btn weui-btn_primary f15" id="toastBtn">提交</a>
             </div>
-
         </div>
     </div>
+    <!-- 维修明细 -->
     <div class="container f15 o_auto" id="repair_info" style="display:none">
         <div class="weui-cells tip" id="night" style="display:block">
             <div class="weui-cell f15">
                 <div class="weui-cell__hd weui-flex__item">
-                    <label class="weui-label w_a">预计金额</label>
+                    <label class="weui-label w_a">类型</label>
                 </div>
-                <div class="weui-cell__bd t_a_r" style="flex:4">
-                    <input type="radio" value="0" name="lb" checked/>工时费
-                    <input type="radio" value="1" name="lb" />材料费
+                <div class="weui-cell__bd t_a_r" style="flex:4" id="lb">
+                    <input type="radio" value="1" name="lb" checked="checked" id="gsf"/>工时费
+                    <input type="radio" value="2" name="lb" id="clf"/>材料费
                 </div>
             </div>
         </div>
@@ -207,36 +210,33 @@
                     <label class="weui-label">编号</label>
                 </div>
                 <div class="weui-cell__bd">
-                    <input class="weui-input t_a_r" placeholder="请输入" id="jsr">
+                    <input class="weui-input t_a_r" placeholder="请输入" id="clbh">
                 </div>
             </div>
         </div>
-        <div class="weui-cells tip">
-            <div class="weui-cell f15">
-                <div class="weui-cell__hd">
-                    <label class="weui-label">材料名称</label>
-                </div>
-                <div class="weui-cell__bd">
-                    <input class="weui-input t_a_r" placeholder="请输入" id="jsr">
+        <div style="position:relative">
+            <div class="weui-cells tip">
+                <div class="weui-cell f15">
+                    <div class="weui-cell__hd">
+                        <label class="weui-label">材料名称</label>
+                    </div>
+                    <div class="weui-cell__bd">
+                        <input class="weui-input t_a_r" placeholder="请输入" id="clmc">
+                    </div>
                 </div>
             </div>
-            <div class="weui-flex f15" style="padding:0 15px;">
-                <div style="width:105px">
+            <div class="search_result" id="clmc_list" style="display:none">
+                <!-- <div>222</div> -->
+            </div>
+        </div>
 
-                </div>
-                <div class="weui-flex__item">
-                    <p>dd</p>
-                    <p>dd</p>                    
-                </div>
-            </div>
-        </div>
         <div class="weui-cells tip">
             <div class="weui-cell f15">
                 <div class="weui-cell__hd">
                     <label class="weui-label">数量</label>
                 </div>
                 <div class="weui-cell__bd">
-                    <input class="weui-input t_a_r" placeholder="请输入" id="jsr">
+                    <input class="weui-input t_a_r" placeholder="请输入" id="clsl" type="number">
                 </div>
             </div>
         </div>
@@ -246,7 +246,7 @@
                     <label class="weui-label">单价</label>
                 </div>
                 <div class="weui-cell__bd">
-                    <input class="weui-input t_a_r" placeholder="请输入" id="jsr">
+                    <input class="weui-input t_a_r" placeholder="请输入" id="cldj" type="number">
                 </div>
             </div>
         </div>
@@ -256,13 +256,13 @@
                     <label class="weui-label">金额</label>
                 </div>
                 <div class="weui-cell__bd">
-                    <input class="weui-input t_a_r" placeholder="请输入" id="jsr">
+                    <input class="weui-input t_a_r" placeholder="0" id="clje" disabled="true">
                 </div>
             </div>
         </div>
         <div>
             <div class="m_15">
-                <a href="javascript:;" class="weui-btn weui-btn_primary f15" id="repair_save">保存</a>
+                <a href="javascript:;" class="weui-btn weui-btn_primary f15" id="clmx_save">保存</a>
             </div>
         </div>
     </div>

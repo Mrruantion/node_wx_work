@@ -1,9 +1,22 @@
 $(document).ready(function () {
     let _user = JSON.parse(localStorage.getItem('user'));
     var _val = $('input[name="order"]:checked').val();
-
+    sessionStorage.setItem('clmx', JSON.stringify({}))
+    let clmc_arr = [];
+    let clmx_option = {};
     getAudit(_val)
 
+    Array.prototype.uniques = function () {
+        var res = [];
+        var json = {};
+        for (var i = 0; i < this.length; i++) {
+            if (!json[this[i].XMMC]) {
+                res.push(this[i].XMMC);
+                json[this[i].XMMC] = 1;
+            }
+        }
+        return res;
+    }
     W.ajax('/fix_apply/code_king', {
         success: function (res) {
             console.log(res)
@@ -11,7 +24,10 @@ $(document).ready(function () {
     })
     W.ajax('/fix_apply/get_repairinfo', {
         success: function (res) {
-            console.log(res)
+            // console.log(res)
+            // console.log(res.uniques())
+            clmc_arr = res.uniques();
+
         }
     })
     // console.log(_user)
@@ -300,6 +316,11 @@ $(document).ready(function () {
 
 
 
+        // function unique(){
+
+        // }
+
+
         // if (_user.user) {
         //     if (_user.user.role == "科所队领导") {
         //         getJson('/getaudit', showaudit, op);
@@ -319,6 +340,187 @@ $(document).ready(function () {
         //     }
         // }
     }
+    $('#clmc').on('input', function () {
+        console.log(this.value, 22);
+        let show_clmc_list = [];
+        let _this = this;
+        show_clmc_list = clmc_arr.filter(ele => ele.includes(this.value));
+        console.log(show_clmc_list);
+        $('#clmc_list').empty();
+
+        for (var i = 0; i < 5; i++) {
+            if (show_clmc_list[i]) {
+                let _id = `list${i}`
+                let tr_content = `<div id="list${i}">${show_clmc_list[i]}</div>`;
+                $('#clmc_list').append(tr_content);
+                $(`#${_id}`).on('click', function () {
+                    // console.log($(`#${_id}`).text())
+                    let _text = $(`#${_id}`).text();
+                    $('#clmc').val(_text);
+                    show_clmc_list = [];
+                    $('#clmc_list').hide()
+                })
+            }
+        }
+        if (this.value.length) {
+            $('#clmc_list').show();
+        } else {
+            $('#clmc_list').hide();
+        }
+    })
+
+    $('#clmx_save').on('click', function () {
+        let is_details = location.hash;
+        let details_index = parseInt(is_details.slice(-1));
+        clmx_option.XMBH = $('#clbh').val();
+        clmx_option.XMMC = $('#clmc').val();
+        clmx_option.SL = $('#clsl').val();
+        clmx_option.DJ = $('#cldj').val();
+        clmx_option.JE = $('#clje').val();
+        clmx_option.LB = $('input[name="lb"]:checked').val();
+        if (!clmx_option.XMMC) {
+            weui.alert('请填写材料名称')
+            return false;
+        }
+        if (!clmx_option.SL) {
+            weui.alert('请填写数量');
+            return false;
+        }
+        if (!clmx_option.DJ) {
+            weui.alert('请填写单价');
+            return false;
+        }
+        // if(!clmx_option.JE){
+        //     weui.alert('请填写金额')
+        // }
+        console.log(clmx_option, 'option')
+        let clmx_arr = sessionStorage.getItem('clmx') ? JSON.parse(sessionStorage.getItem('clmx')) : {};
+        !clmx_arr.clmx_arr ? clmx_arr.clmx_arr = [] : null;
+        let _i;
+        if(is_details.includes('details')){
+            _i = details_index;
+        }else {
+            _i = clmx_arr.clmx_arr ? clmx_arr.clmx_arr.length : 0;
+        }
+        clmx_arr.clmx_arr[_i] = clmx_option;
+        sessionStorage.setItem('clmx', JSON.stringify(clmx_arr));
+        history.back();
+        show_wxmx(clmx_arr)
+    })
+
+    function show_wxmx(data) {
+        $('#show_clli').empty();
+        data.clmx_arr.forEach((ele, index) => {
+            let _lb;
+            ele.LB == 1 ? _lb = '工时费' : _lb = '材料费'
+            let tr_content = `<div class="weui-flex" style="line-height:2">
+            <div class="weui-flex__item">
+                <div class="placeholder t_a_c">${_lb}</div>
+            </div>
+            <div class="weui-flex__item">
+                <div class="placeholder t_a_c">${ele.XMMC}</div>
+            </div>
+            <div class="weui-flex__item">
+                <div class="placeholder t_a_c">${ele.JE}</div>
+            </div>
+            <div class="weui-flex__item">
+                <div class="placeholder t_a_c">
+                    <input type='button' value="详情" id=xq_${index} />
+                    <input type='button' value="删除" id=delete_${index} />
+                </div>
+            </div>
+        </div>`
+            $('#show_clli').append(tr_content);
+            $('#xq_' + index).on('click', function () {
+                // console.log(index)
+                $('#container').hide();
+                $('#repair_info').show();
+                var state = { 'page_id': 1, 'user_id': 5 };
+                var title = '明细详情';
+                var url = 'fix_apply#details_' + index;
+                let _thisArr = data.clmx_arr[index];
+
+                // $("#lb").find("input[name='lb']").removeAttr("checked");
+                console.log($("#gsf"))
+                $("#gsf")[0].checked = false;
+                $('#clf')[0].checked = false;
+                console.log($("#lb").find("input[name='lb']"))
+                // console.log($("#lb").find("input[name='lb']"))
+                if (_thisArr.LB == 1) {
+                    // $("#gsf").attr("checked", 'checked');
+                    $("#gsf")[0].checked = true;
+                } else if (_thisArr.LB == 2) {
+                    $('#clf')[0].checked = true;
+                    // $("#clf").attr("checked", 'checked');
+                }
+                console.log($('input[name="lb"]:checked').val())
+                $('#clbh').val(_thisArr.XMBH);
+                $('#clmc').val(_thisArr.XMMC);
+                $('#clsl').val(_thisArr.SL);
+                $('#cldj').val(_thisArr.DJ);
+                $('#clje').val(_thisArr.JE)
+                history.pushState(state, title, url);
+                window.addEventListener('popstate', function (e) {
+                    // console.log(e);
+                    $('#container').show();
+                    $('#repair_info').hide();
+                });
 
 
+
+            })
+            $('#delete_' + index).on('click', function () {
+                // console.log(index);
+                data.clmx_arr.splice(index, 1);
+                sessionStorage.setItem('clmx', JSON.stringify(data));
+                show_wxmx(data)
+            })
+        });
+        if (data.clmx_arr.length) {
+            $('#show_clli').prepend(`<div class="weui-flex" style="background:#cccccc47;line-height:2">
+            <div class="weui-flex__item">
+                <div class="placeholder t_a_c">类别</div>
+            </div>
+            <div class="weui-flex__item">
+                <div class="placeholder t_a_c">材料名称</div>
+            </div>
+            <div class="weui-flex__item">
+                <div class="placeholder t_a_c">金额</div>
+            </div>
+            <div class="weui-flex__item">
+                <div class="placeholder t_a_c">操作</div>
+            </div>
+        </div>`);
+            $('#show_clli').show();
+        }
+
+
+    }
+    $('#clsl').on('input', function () {
+        let _dj = $('#cldj').val();
+        if (this.value && _dj) {
+            let _je = this.value * _dj
+            $('#clje').val(_je)
+        } else {
+            $('#clje').val('')
+        }
+    })
+    $('#cldj').on('input', function () {
+        let _sl = $('#clsl').val();
+        if (this.value && _sl) {
+            let _je = this.value * _sl
+            $('#clje').val(_je)
+        } else {
+            $('#clje').val('')
+        }
+    })
+
+    $('body').bind('click', function (event) {
+        // IE支持 event.srcElement ， FF支持 event.target    
+        var evt = event.srcElement ? event.srcElement : event.target;
+        if (evt.id == 'clmc_list') return; // 如果是元素本身，则返回
+        else {
+            $('#clmc_list').hide(); // 如不是则隐藏元素
+        }
+    });
 })
