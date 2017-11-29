@@ -66,6 +66,92 @@ W.dateToString = function (d) {
     }
     return d.getFullYear() + "-" + j.m + "-" + j.d + " " + j.h + ":" + j.mi + ":" + j.s;
 }
+W.date = function (str) {
+    var date = new Date();
+    if (!str)
+        return date;
+    var t = str.split(/[T\s]/);
+    if (t.length < 2)
+        t = (str + ' 00:00:00').split(/[T\s]/);
+    var str_before = t[0]; //获取年月日
+    var str_after = t[1]; //获取时分秒
+    var years = str_before.split('-')[0]; //分别截取得到年月日
+    var months = str_before.split('-')[1] - 1;
+    var days = str_before.split('-')[2];
+    var hours = str_after.split(':')[0] || 0;
+    var mins = str_after.split(':')[1] || 0;
+    var seces = str_after.split(':')[2].replace("Z", "");
+    var secs = seces.split('.')[0] || 0;
+    var smsecs = seces.split('.')[1] || 0;
+    if (str.indexOf("T") == -1) {
+        date.setFullYear(years, months, days);
+        date.setHours(hours, mins, secs, smsecs);
+    } else {
+        date.setUTCFullYear(years, months, days);
+        date.setUTCHours(hours, mins, secs, smsecs);
+    }
+    return date;
+}
+
+W.getBeforeDate = function(n){
+    var now = new Date();
+    var aftertime = new Date(n);
+    var year = now.getFullYear();
+    var mon= now.getMonth()+1;
+    var day= now.getDate();
+    var year_after = aftertime.getFullYear();
+    var mon_after = aftertime.getMonth()+1;
+    var day_after = aftertime.getDate();
+    var chs = 0;
+    //获取当月的天数
+    function DayNumOfMonth(Year,Month)
+    {
+        return 32 - new Date(Year,Month-1,32).getDate();
+    }
+    if(aftertime.getTime() - now.getTime() < 0){
+        var temp1 = day_after;
+        var temp2 = mon_after;
+        var temp3 = year_after;
+        day_after = day;
+        mon_after = mon;
+        year_after = year;
+        day = temp1;
+        mon = temp2;
+        year = temp3;
+    }
+    if(year == year_after){//不跨年
+        if(mon == mon_after){//不跨年不跨月
+            chs += day_after-day;
+        }else{//不跨年跨月
+            chs += DayNumOfMonth(year,mon)- day+1;//加上第一个不满的
+            for(var i=1;i< mon_after-mon;i++){
+                chs += DayNumOfMonth(year,mon+i);
+            }
+            chs += day_after-1;//加上
+        }    
+    }else{//存在跨年
+        chs += DayNumOfMonth(year,mon)- day+1;//加上开始年份不满的一个月
+        for(var m=1;m<12-mon;m++){
+            chs += DayNumOfMonth(year,mon+m);
+        }
+        for(var j=1;j < year_after-year;j++){
+            if((year+j)%400 == 0 || (year+j)%4 == 0 && (year+j)%100 != 0){
+                chs += 366;
+            }else{
+                chs += 365;
+            }
+        }
+        for(var n=1;n <= mon_after;n++){
+            chs += DayNumOfMonth(year_after,n);
+        }
+        chs += day_after-1;
+    }
+    if(aftertime.getTime() - now.getTime() < 0){
+        return -chs;
+    }else{
+         return chs;
+    }
+}
 
 W.ajax = function (url, options) {
     var json = {

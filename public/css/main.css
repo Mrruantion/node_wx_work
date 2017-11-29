@@ -4,6 +4,12 @@
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #CCC;
 }
+.tip::before{
+    z-index: 0
+}
+.tip::after{
+    z-index: 0
+}
 .move_top_hr::before {
     border-top: 0
 }
@@ -319,4 +325,16 @@ check::before,check::after{
     background: #fff;
     margin-top: 10px;
     display: none;
+}
+.p_r {
+    position: relative
+}
+.slh {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.cell::before{
+    left: 0;
+    z-index: 0
 }

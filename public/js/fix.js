@@ -1,6 +1,14 @@
 $(document).ready(function () {
-    let _user = JSON.parse(localStorage.getItem('user'));
+
+    let _g = W.getSearch();
+    var _user = JSON.parse(localStorage.getItem('user'));
+    window._user = _user;
+    // let _user = JSON.parse(localStorage.getItem('user'));
     var _val = $('input[name="order"]:checked').val();
+    let _apply2 = {
+        option: {},
+        spstatus: []
+    };
     sessionStorage.setItem('clmx', JSON.stringify({}))
     let clmc_arr = [];
     let clmx_option = {};
@@ -17,6 +25,7 @@ $(document).ready(function () {
         }
         return res;
     }
+
     W.ajax('/fix_apply/code_king', {
         success: function (res) {
             console.log(res)
@@ -26,61 +35,14 @@ $(document).ready(function () {
         success: function (res) {
             // console.log(res)
             // console.log(res.uniques())
-            clmc_arr = res.uniques();
+            clmc_arr = res.uniques(); //获取唯一的维修项目名称
 
         }
     })
     // console.log(_user)
 
 
-    //进厂日期
-    $('#jcrq').on('click', function () {
-        let _year = new Date().getFullYear();
-        let _mon = new Date().getMonth() + 1;
-        let _day = new Date().getDate();
-        let end_year = _year + 20;
-        console.log(_mon)
-        weui.datePicker({
-            start: _year,
-            end: end_year,
-            defaultValue: [_year, _mon, _day],
-            onChange: function (res) {
-                console.log(res);
-            },
-            onConfirm: function (res) {
-                // console.log(res);
-                let dateString = res[0].value + '-' + res[1].value + '-' + res[2].value;
-                console.log(dateString)
-                $('#jcrq .weui-cell__ft').text(dateString);
-                $('#jcrq .weui-cell__ft').css({ color: '#000' })
-            },
-            id: 'jcrq'
-        })
-    })
-    //出厂日期
-    $('#ccrq').on('click', function () {
-        let _year = new Date().getFullYear();
-        let _mon = new Date().getMonth() + 1;
-        let _day = new Date().getDate();
-        let end_year = _year + 20;
-        console.log(_mon)
-        weui.datePicker({
-            start: _year,
-            end: end_year,
-            defaultValue: [_year, _mon, _day],
-            onChange: function (res) {
-                console.log(res);
-            },
-            onConfirm: function (res) {
-                // console.log(res);
-                let dateString = res[0].value + '-' + res[1].value + '-' + res[2].value;
-                console.log(dateString)
-                $('#ccrq .weui-cell__ft').text(dateString);
-                $('#ccrq .weui-cell__ft').css({ color: '#000' })
-            },
-            id: 'ccrq'
-        })
-    })
+
 
 
 
@@ -101,6 +63,7 @@ $(document).ready(function () {
     $('#add_repairInfo').on('click', function () {
         $('#container').hide();
         $('#repair_info').show();
+        $('#clmx_delete').hide();
         var state = { 'page_id': 1, 'user_id': 5 };
         var title = '添加明细';
         var url = 'fix_apply#add_repair';
@@ -117,7 +80,7 @@ $(document).ready(function () {
 
     //获取号牌号码
     W.ajax('/fix_apply/hphm', {
-        data: { depart: 34 },
+        data: { depart: _user.depart.id },
         success: function (res) {
             // console.log(res)
             console.log(res)
@@ -125,7 +88,7 @@ $(document).ready(function () {
             res.forEach((ele, index) => {
                 let wx_op = {
                     label: ele.name,
-                    value: ele.id
+                    value: index
                 };
                 op_arr.push(wx_op)
 
@@ -133,10 +96,32 @@ $(document).ready(function () {
             $('#hphm').on('click', function () {
                 weui.picker(op_arr, {
                     onChange: function (result) {
-                        console.log(result);
+                        // console.log(result);
                     },
                     onConfirm: function (result) {
+                        console.log(res[result[0].value], 'd');
+                        let _this_car = res[result[0].value];
+                        _apply2.option.HPZL = _this_car.plate_type;
+                        let _hpzl = _this_car.plate_type == '02' ? '小型汽车' : '大型汽车'
+                        let _clxh = _this_car.model;
+                        let _date = W.date(_this_car.registe_date)
+                        let _time = _date.getTime();
+                        let _nowTime = Date.parse(new Date());
+                        let all_Month = parseInt((_nowTime - _time) / (1000 * 60 * 60 * 24 * 30));
+                        let _year = _date.getFullYear()
+                        let _month = _date.getMonth() + 1;
+                        let _dates = _date.getDate();
+                        let _gmrq = _year + '-' + _month + '-' + _dates;
+                        let _synx = '已使用' + ~~(all_Month / 12) + '年'
+                        // console.log()
+                        $('#hmzl').text(_hpzl);
+                        $('#cpxh').text(_clxh);
+                        $('#gmrq').text(_gmrq);
+                        $('#synx').text(_synx);
+                        $('#show_carnumber').show();
                         let text = result[0].label;
+
+                        _apply2.option.HPHM = text;
                         $('#hphm .weui-cell__ft').text(text);
                         $('#hphm .weui-cell__ft').css({ color: '#000' })
                     },
@@ -153,7 +138,7 @@ $(document).ready(function () {
             res.forEach((ele, index) => {
                 let wx_op = {
                     label: ele.MC,
-                    value: ele.XLH
+                    value: index
                 };
                 op_arr.push(wx_op)
 
@@ -165,7 +150,10 @@ $(document).ready(function () {
                     },
                     onConfirm: function (result) {
                         let text = result[0].label;
+                        _apply2.option.WXDWLXDH = res[result[0].value].DH
+                        _apply2.option.WXDW = text;
                         $('#wxdw .weui-cell__ft').text(text);
+                        $('#wxdh').val(res[result[0].value].DH)
                         $('#wxdw .weui-cell__ft').css({ color: '#000' })
                     },
                     id: 'wxdw'
@@ -184,6 +172,7 @@ $(document).ready(function () {
     });
 
     //获取审核人
+    let apend_data = [];
     function getAudit(v) {
         let op = {};
         op.depart = _user.depart.id;
@@ -227,15 +216,32 @@ $(document).ready(function () {
 
             })
         }
-        let apend_data = [];
+
         function showaudit(res) {
             console.log(res, 'res')
-            let auditer = res.filter(ele => { return ele.role == '科所队领导' || ele.role == '局领导' || ele.role == '警务保障室领导' })
-            console.log(auditer)
-            let k_l = res.filter(ele => { return ele.role == '科所队领导' })
-            let j_l = res.filter(ele => { return ele.role == '警务保障室领导' });
-            let ju_l = res.filter(ele => { return ele.role == '局领导' });
+            let jed = $('input[name="price"]:checked').val();
+            console.log(jed, 'jed')
+            let auditer;
+            if (jed == 0) {
+                auditer = res.filter(ele => { return ele.role == '科所队领导' })
+            } else if (jed == 1) {
+                auditer = res.filter(ele => { return ele.role == '科所队领导' || ele.role == '警务保障室领导' })
+            } else {
+                auditer = res.filter(ele => { return ele.role == '科所队领导' || ele.role == '局领导' || ele.role == '警务保障室领导' })
+            }
+            // let auditer = res.filter(ele => { return ele.role == '科所队领导' || ele.role == '局领导' || ele.role == '警务保障室领导' })
+            // console.log(auditer)
+            let k_l = auditer.filter(ele => { return ele.role == '科所队领导' })
+            let j_l = auditer.filter(ele => { return ele.role == '警务保障室领导' });
+            let ju_l = auditer.filter(ele => { return ele.role == '局领导' });
+            // if (jed == 0) {
+            //     apend_data = [k_l[0], null, null];
+            // } else if (jed == 1) {
+            //     apend_data = [k_l[0], j_l[0], null];
+            // } else {
             apend_data = [k_l[0], j_l[0], ju_l[0]];
+            // }
+
             // $('#add_auditer').empty();
             show_auditer(apend_data)
 
@@ -340,6 +346,7 @@ $(document).ready(function () {
         //     }
         // }
     }
+
     $('#clmc').on('input', function () {
         console.log(this.value, 22);
         let show_clmc_list = [];
@@ -397,9 +404,9 @@ $(document).ready(function () {
         let clmx_arr = sessionStorage.getItem('clmx') ? JSON.parse(sessionStorage.getItem('clmx')) : {};
         !clmx_arr.clmx_arr ? clmx_arr.clmx_arr = [] : null;
         let _i;
-        if(is_details.includes('details')){
+        if (is_details.includes('details')) {
             _i = details_index;
-        }else {
+        } else {
             _i = clmx_arr.clmx_arr ? clmx_arr.clmx_arr.length : 0;
         }
         clmx_arr.clmx_arr[_i] = clmx_option;
@@ -408,28 +415,46 @@ $(document).ready(function () {
         show_wxmx(clmx_arr)
     })
 
+    $('#clmx_delete').on('click', function () {
+        let is_details = location.hash;
+        let details_index = parseInt(is_details.slice(-1));
+        let clmx_arr = sessionStorage.getItem('clmx') ? JSON.parse(sessionStorage.getItem('clmx')) : {};
+        clmx_arr.clmx_arr.splice(details_index, 1);
+        sessionStorage.setItem('clmx', JSON.stringify(clmx_arr));
+        // console.log(location);
+        // debugger;
+        history.back();
+        show_wxmx(clmx_arr)
+    })
+
     function show_wxmx(data) {
+        let _all_je = 0;
         $('#show_clli').empty();
         data.clmx_arr.forEach((ele, index) => {
             let _lb;
+            _all_je += parseFloat(ele.JE);
             ele.LB == 1 ? _lb = '工时费' : _lb = '材料费'
-            let tr_content = `<div class="weui-flex" style="line-height:2">
-            <div class="weui-flex__item">
-                <div class="placeholder t_a_c">${_lb}</div>
-            </div>
-            <div class="weui-flex__item">
-                <div class="placeholder t_a_c">${ele.XMMC}</div>
-            </div>
-            <div class="weui-flex__item">
-                <div class="placeholder t_a_c">${ele.JE}</div>
-            </div>
-            <div class="weui-flex__item">
-                <div class="placeholder t_a_c">
-                    <input type='button' value="详情" id=xq_${index} />
-                    <input type='button' value="删除" id=delete_${index} />
+
+            let tr_content = `<div style="position:relative">
+            <a class="weui-cell weui-cell_access cell" href="javascript:;" style="padding:0;line-height:3" id="xq_${index}">
+                <div class="weui-cell__bd" style="flex:1">
+                    <div class="placeholder t_a_c">${_lb}</div>
                 </div>
-            </div>
+                <div class="weui-cell__bd slh">
+                    <div class="placeholder t_a_c slh">${ele.XMMC}</div>
+                </div>
+                <div class="weui-cell__bd">
+                    <div class="placeholder t_a_c">${ele.JE}</div>
+                </div>
+                <div class="weui-cell__bd">
+                </div>
+            </a>
+            <span class="" style="position: absolute;right: 36px;top:10px;" id="delete_${index}">
+                <i class="weui-icon-cancel icon-delete" style="font-size:20px;color:red"></i>
+            </span>
         </div>`
+
+
             $('#show_clli').append(tr_content);
             $('#xq_' + index).on('click', function () {
                 // console.log(index)
@@ -438,7 +463,14 @@ $(document).ready(function () {
                 var state = { 'page_id': 1, 'user_id': 5 };
                 var title = '明细详情';
                 var url = 'fix_apply#details_' + index;
+                history.pushState(state, title, url);
+                window.addEventListener('popstate', function (e) {
+                    // console.log(e);
+                    $('#container').show();
+                    $('#repair_info').hide();
+                });
                 let _thisArr = data.clmx_arr[index];
+                $('#clmx_delete').show();
 
                 // $("#lb").find("input[name='lb']").removeAttr("checked");
                 console.log($("#gsf"))
@@ -459,14 +491,6 @@ $(document).ready(function () {
                 $('#clsl').val(_thisArr.SL);
                 $('#cldj').val(_thisArr.DJ);
                 $('#clje').val(_thisArr.JE)
-                history.pushState(state, title, url);
-                window.addEventListener('popstate', function (e) {
-                    // console.log(e);
-                    $('#container').show();
-                    $('#repair_info').hide();
-                });
-
-
 
             })
             $('#delete_' + index).on('click', function () {
@@ -476,8 +500,9 @@ $(document).ready(function () {
                 show_wxmx(data)
             })
         });
+        $('#all_je').text(_all_je)
         if (data.clmx_arr.length) {
-            $('#show_clli').prepend(`<div class="weui-flex" style="background:#cccccc47;line-height:2">
+            $('#show_clli').prepend(`<div class="weui-flex" style="background:#ececec;line-height:3">
             <div class="weui-flex__item">
                 <div class="placeholder t_a_c">类别</div>
             </div>
@@ -515,6 +540,116 @@ $(document).ready(function () {
         }
     })
 
+
+
+    $('#submit').on('click', function () {
+        console.log(1)
+        // let _val = $('input[name="wxlx"]:checked').val();
+        let repair_info = JSON.parse(sessionStorage.getItem('clmx'))
+        if (repair_info.clmx_arr) {
+            if (!repair_info.clmx_arr.length) {
+                weui.alert('请添加维修明细');
+                return false
+            }
+        } else {
+            weui.alert('请添加维修明细');
+            return false
+        }
+        console.log(repair_info, 'repari')
+        let _checkVal = [];
+        $('input[name="wxlx"]').forEach(ele => {
+            ele.checked ? _checkVal.push(ele.value) : null
+        })
+        let yjjed_type = $('input[name="price"]:checked').val();
+        let yjjed;
+        // console.log(_checkVal.join(''))
+        if (yjjed_type == 0) {
+            yjjed = '2000以内';
+            _apply2.option.SPJB = 11;
+            _apply2.option.XGLC = 0;
+            if (!apend_data[0]) {
+                weui.alert('请选择科所队领导')
+                return false;
+            }
+        } else if (yjjed_type == 1) {
+            yjjed = '2000--3000';
+            _apply2.option.SPJB = 12;
+            _apply2.option.XGLC = 4;
+            if (!apend_data[0] || !apend_data[1]) {
+                if (!apend_data[0]) {
+                    weui.alert('请选择科所队领导');
+                } else {
+                    weui.alert('请选择警务保障室领导');
+                }
+                return false;
+            }
+        } else if (yjjed_type == 2) {
+            yjjed = '3000以上';
+            _apply2.option.SPJB = 13;
+            _apply2.option.XGLC = 4;
+            if (!apend_data[0] || !apend_data[1] || !apend_data[2]) {
+                if (!apend_data[0]) {
+                    weui.alert('请选择科所队领导')
+                } else if (!apend_data[1]) {
+                    weui.alert('请选择警务保障室领导')
+                } else {
+                    weui.alert('请选择局领导')
+                }
+                return false;
+            }
+        }
+
+        let _spjb;
+
+        console.log(apend_data)
+        // if()
+        _apply2.option.WXLX = _checkVal.join('');
+        _apply2.option.SQR = $('#applyer').val()
+        _apply2.option.SQSJ = W.dateToString(new Date());
+        _apply2.option.YJJED = yjjed;
+        _apply2.option.WXDWLXDH = $('#wxdh').val();
+        _apply2.option.ZJE = $('#all_je').text();
+        _apply2.option.DEPT = _user.depart.id;
+        _apply2.option.STATE = 1;
+        _apply2.option.DQLC = 2;
+        _apply2.spstatus = apend_data;
+        _apply2.repair_info = repair_info;
+        if (!_apply2.option.SQR) {
+            weui.alert('请输入申请人');
+            return false;
+        }
+        if (!_apply2.option.HPHM) {
+            weui.alert('请选择号码号牌');
+            return false;
+        }
+        if (!_apply2.option.WXDW) {
+            weui.alert('请选择维修单位');
+            return false;
+        }
+        if (!_apply2.option.WXLX) {
+            weui.alert('请选择维修类型')
+        }
+        getJson('/fix_apply/add_apply2', function (res) {
+            console.log(res)
+            sendmessage(res, _user.user.userid, _apply2.option.SQR, '车修申请', function () {
+                sendmessage(res, apend_data[0].userid, _apply2.option.SQR)
+            })
+
+
+        }, { data: _apply2 })
+        // W.ajax('/fix_apply/add_apply2', {
+        //     data: _apply2,
+        //     success: function (res) {
+        //         console.log(res)
+        //     }
+
+        // })
+        // console.log($('#applyer').val())
+        // console.log(_val, 'd')
+        // console.log(_apply2)
+    })
+
+
     $('body').bind('click', function (event) {
         // IE支持 event.srcElement ， FF支持 event.target    
         var evt = event.srcElement ? event.srcElement : event.target;
@@ -523,4 +658,51 @@ $(document).ready(function () {
             $('#clmc_list').hide(); // 如不是则隐藏元素
         }
     });
+
+    function getJson(url, callback, option, type) {
+        var types = type ? type : 'get';
+        var option = Object.assign({}, option ? option : {})
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            data: option,
+            timeout: 10000,
+            type: types,
+            success: callback,
+            error: function (err) { },
+        })
+    }
+
+    function sendmessage(id, userid, name, ti, callback) {
+        var titles = ti || '车修申请'
+        let str = 'http://jct.chease.cn' + '/fix_detail?applyid=' + id;
+        if (ti) {
+            str += '&my=true'
+        }
+        let _desc = name + '的车修'
+        let _op_data = { touser: userid, title: titles, desc: _desc, url: str, remark: "查看详情" };
+        $.ajax({
+            url: 'http://h5.bibibaba.cn/send_qywx.php',
+            data: _op_data,
+            dataType: 'jsonp',
+            crossDomain: true,
+            success: function (re) {
+                // top.location = '/fix_detail?applyid=' + id + '&my=true'
+                if (ti) {
+                    callback();
+                } else {
+                    top.location = '/fix_detail?applyid=' + id + '&my=true'
+                }
+
+            },
+            error: function (err) {
+                // top.location = '/fix_detail?applyid=' + id + '&my=true'
+                if (ti) {
+                    callback();
+                } else {
+                    top.location = '/fix_detail?applyid=' + id + '&my=true'
+                }
+            }
+        })
+    }
 })
