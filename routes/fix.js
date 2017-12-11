@@ -108,12 +108,14 @@ router.get('/add_apply2', function (req, res, next) {
         let i = 0;
         spstatus_data.forEach(ele => {
             if (ele) {
+                let _cre_tm = ~~(new Date(_option.SQSJ).getTime() / 1000)
                 let _sop = {
                     id: 0,
                     uid: ele.id,
                     apply2_id: applyid,
-                    cre_tm: new Date(_option.SQSJ).getTime(),
-                    isagree: 0
+                    cre_tm: _cre_tm,
+                    isagree: 0,
+                    sp_status: 1
                 }
                 if (ele.role == "科所队领导") {
                     _sop.status = 1
@@ -192,7 +194,7 @@ router.get('/get_apply2', function (req, res, next) {
     db.query(str, function (err, row1) {
         var str4 = 'select * from ga_user where depart = ' + row1[0].id
         op_d.apply2 = row1;
-        let str2 = "select a.*,b.* from (select * ,ga_spstatus.id As sid,ga_spstatus.status As sstatus from ga_spstatus where apply2_id = " + query.id + ") as a left join ga_user as b on a.uid = b.id order by a.sstatus";
+        let str2 = "select a.*,b.* from (select * ,ga_spstatus.id As sid,ga_spstatus.cre_tm As scre_tm,ga_spstatus.status As sstatus from ga_spstatus where apply2_id = " + query.id + ") as a left join ga_user as b on a.uid = b.id order by a.sstatus";
         // var str2 = 'select * from ga_spstatus where apply2_id = ' + query.id;
         console.log(err, row1)
         db.query(str2, function (err2, row2) {
@@ -202,29 +204,38 @@ router.get('/get_apply2', function (req, res, next) {
             db.query(str3, function (err3, row3) {
                 console.log(err3, row3)
                 op_d.repair_info = row3;
-                db.query(str4,function(err4,row4){
+                db.query(str4, function (err4, row4) {
                     op_d.user = row4;
                     res.json(op_d)
                 })
-                
+
             })
         })
     })
     console.log(str)
 })
 
-
+//撤销申请
 router.get('/update_apply2', function (req, res, next) {
     var db = req.con;
     var query = req.query;
     let str = ''
-    for (var o in query) { if (o != 'id') str += (o + ' ="' + query[o] + '",') }
+    for (var o in query) { if (o != 'id' && o != 'sp_status') str += (o + ' ="' + query[o] + '",') }
     str = str.slice(0, -1);
     console.log(str)
     let sql = 'update ga_apply2 set ' + str + ' where XLH = ' + query['id']
     console.log(sql);
     db.query(sql, function (err, row) {
-        res.json(row)
+        // console.log(err,row,'row')
+        if (err) throw err
+        if (query.sp_status) {
+            let sql2 = 'update ga_spstatus set sp_status = ' + query.sp_status + ' where apply2_id =' + query['id'];
+            db.query(sql2,function(error,spstatus){
+                res.json(row)
+            })
+        } else {
+            res.json(row)
+        }
     })
 
 })
@@ -234,7 +245,11 @@ router.get('/update_apply2_spstatus', function (req, res, next) {
     var query = JSON.parse(req.query.data);
     console.log(query)
     var str = 'update ga_apply2 set STATE = "' + query.STATE + '", DQLC = "' + query.DQLC + '", XGLC = "' + query.XGLC + '" where XLH = ' + query.id;
-    var str1 = 'update ga_spstatus set isagree = ' + query.isagree + ' where id = ' + query.sid
+    var str1 = 'update ga_spstatus set isagree = ' + query.isagree + ' where id = ' + query.sid;
+    var str3 = '';
+    if(query.sp_status){
+        str3 = 'update ga_spstatus set sp_status = ' + query.sp_status + ' where apply2_id = ' + query.id;
+    }
     var str2 = '';
     if (query.spstatus) {
         let sps = query.spstatus;
@@ -265,11 +280,21 @@ router.get('/update_apply2_spstatus', function (req, res, next) {
             if (query.spstatus) {
                 console.log(true)
                 db.query(str2, function (err2, row2) {
-                    res.json(row2)
+                    if(query.sp_status){
+                        db.query(str3,function(err3,row3){
+                            res.json(row2)
+                        })
+                    }
+                    
                 })
             } else {
-                console.log(false, 'false')
-                res.json(row1)
+                // console.log(false, 'false')
+                // res.json(row1)
+                if(query.sp_status){
+                    db.query(str3,function(err3,row3){
+                        res.json(row1)
+                    })
+                }
             }
         })
     })

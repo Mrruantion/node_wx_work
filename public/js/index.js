@@ -268,11 +268,14 @@ $(document).ready(function () {
             if (ele.isagree) {
                 audited.push(ele)
             } else {
-                if(ele.STATE == 1){
-                    auditing.push(ele)
-                }else {
-                    audited.push(ele) 
-                }
+                // if(ele.STATE == 1){
+                    if(ele.sp_status == 1){
+                        auditing.push(ele)
+                    }
+                    
+                // }else {
+                    // audited.push(ele) 
+                // }
                 
             }
         })
@@ -390,7 +393,7 @@ $(document).ready(function () {
                                         <p class="c_9">车牌号码</p>
                                     </div>
                                     <div class="weui-cell__bd">
-                                        <p>${ele.car_num}</p>
+                                        <p>${ele.car_num||'空'}</p>
                                     </div>
                                 </div>
                             </div>

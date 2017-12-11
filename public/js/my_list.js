@@ -41,7 +41,7 @@ $(document).ready(function () {
                 $('#name').text('我的用车');
                 $('#my_button').show();
             } else {
-                $('#name').text(ele.name + '的用车');
+                $('#name').text(ele.aname + '的用车');
                 $('#other_button').show();
             }
         });
@@ -123,21 +123,33 @@ $(document).ready(function () {
 
                 $('#agree').on('click', function () {
                     // let etm = 
+                    let d_op = {
+                        id: res.spstatus[0].sid,
+                        isagree: 1,
+                        applyid: _g.applyid,
+                        sp_status: 5,
+                    }
                     getJson('./agree_apply', function (res) {
                         // console.log(res)
                         sendmessage(_res.apply[0].aid, _res.apply[0].userid, username, '审批通过');
                         // history.go(0)
 
-                    }, { id: res.spstatus[0].sid, isagree: 1 })
+                    }, d_op)
                 })
                 $('#reject').on('click', function () {
                     let re_etm = ~~(new Date().getTime() / 1000);
-
+                    let d_op = {
+                        id: res.spstatus[0].sid,
+                        isagree: 2,
+                        applyid: _g.applyid,
+                        sp_status: 4,
+                        etm: re_etm
+                    }
                     getJson('./agree_apply', function (res) {
                         console.log(res)
                         sendmessage(_res.apply[0].aid, _res.apply[0].userid, username, '审批驳回');
                         // history.go(0)
-                    }, { id: res.spstatus[0].sid, isagree: 2, applyid: res.apply[0].aid, etm: re_etm })
+                    }, d_op)
                 })
 
             } else if (res.spstatus.length == 3) {
@@ -157,6 +169,7 @@ $(document).ready(function () {
                 }
                 let _userid = null;
                 let _sid = null;
+                let d_op = {};
                 if (!res.spstatus[0].isagree) {
                     _userid = res.spstatus[0].userid;
                     _sid = res.spstatus[0].sid
@@ -165,32 +178,19 @@ $(document).ready(function () {
                     _sid = res.spstatus[1].sid
                 } else if (!res.spstatus[2].isagree) {
                     _userid = res.spstatus[2].userid
-                    _sid = res.spstatus[2].sid
+                    _sid = res.spstatus[2].sid;
+                    d_op.sp_status = 5
                 }
-
                 $('#urge').on('click', function () {
-                    // str = 'http://jct.chease.cn' + '/my_list?applyid=' + res.apply[0].aid
-                    // let url = 'http://h5.bibibaba.cn/send_qywx.php?touser=' + _userid
-                    //     + '&toparty=&totag=&'
-                    //     + 'title=用车申请&'
-                    //     + 'desc=' + _user.user.name + '的用车&'
-                    //     + 'url=' + str + '&remark=查看详情'
-                    // // if (res.spstatus[0]) {
-                    // W.ajax(url, {
-                    //     dataType: 'json',
-                    //     success: function (res) {
-                    //         // console.log(res)
-                    //         weui.alert('已催办')
-                    //     }
-                    // })
-
                     sendmessage(res.apply[0].aid, _userid, username, null, '已催办')
-                    // }
                 })
 
 
                 $('#agree').on('click', function () {
                     // let etm = 
+                    d_op.id = _sid;
+                    d_op.isagree = 1;
+                    d_op.applyid = _g.applyid;
                     let _senid = res.apply[0].aid
                     getJson('./agree_apply', function (res) {
                         // console.log(res);
@@ -201,9 +201,7 @@ $(document).ready(function () {
                             sendmessage(_senid, res.apply[0].userid, username, '审批通过')
                             // history.back();
                         }
-
-
-                    }, { id: _sid, isagree: 1 })
+                    }, d_op)
                 })
                 $('#reject').on('click', function () {
                     let _senid = res.apply[0].aid;
@@ -213,7 +211,7 @@ $(document).ready(function () {
                         // console.log(res);
                         sendmessage(_senid, res.apply[0].userid, username, '审批驳回')
                         // history.go(0)
-                    }, { id: _sid, isagree: 2, applyid: res.apply[0].aid, etm: re_etm })
+                    }, { id: _sid, isagree: 2, applyid: res.apply[0].aid, etm: re_etm, sp_status: 4 })
                 })
 
                 if (_user.user.role == '科所队领导' || _user.user.role == '警务保障室领导' || _user.user.role == '局领导') {
@@ -365,7 +363,7 @@ $(document).ready(function () {
                 // top.location
                 sendmessage(_res.apply[0].aid, _res.apply[0].userid, username, '撤销成功')
 
-            }, { etm: etm, id: res.apply[0].aid })
+            }, { etm: etm, id: res.apply[0].aid, sp_status: 0 })
         })
         //车队还车
         $('#back_carlist').on('click', function () {
@@ -374,7 +372,7 @@ $(document).ready(function () {
                 console.log(res)
                 sendmessage(_res.apply[0].aid, _res.apply[0].userid, username, '还车成功')
                 history.go(0)
-            }, { etm: etm, id: res.apply[0].aid })
+            }, { etm: etm, id: res.apply[0].aid, sp_status: 6 })
         })
         //用于我还车
         $('#back_car').on('click', function () {
@@ -384,7 +382,7 @@ $(document).ready(function () {
                 // top.location
                 sendmessage(_res.apply[0].aid, _res.apply[0].userid, username, '还车成功')
 
-            }, { etm: etm, id: res.apply[0].aid })
+            }, { etm: etm, id: res.apply[0].aid, sp_status: 6})
         })
 
         $('#carlist_back').on('click', function () {

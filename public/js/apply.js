@@ -406,6 +406,9 @@ $(document).ready(function () {
         let j_l = res.filter(ele => { return ele.role == '警务保障室领导' });
         let ju_l = res.filter(ele => { return ele.role == '局领导' });
         apend_data = [k_l[0], j_l[0], ju_l[0]];
+        if(_user.user.role == '科所队领导'){
+            apend_data = [k_l[0]]
+        }
         // $('#add_auditer').empty();
         show_auditer(apend_data)
 
@@ -651,7 +654,7 @@ $(document).ready(function () {
                 // } else {
                 //     history.go(0);
                 // }
-                top.location = '/my_list?applyid=' + res + '&my=true'
+                top.location = '/my_list?applyid=' + id + '&my=true'
             },
             error: function (err) {
                 // console.log(err)
@@ -662,8 +665,9 @@ $(document).ready(function () {
                 // } else {
                 //     history.go(0);
                 // }
-                top.location = '/my_list?applyid=' + res + '&my=true'
+                top.location = '/my_list?applyid=' + id + '&my=true'
             }
         })
     }
+    console.log(window.parent.location,'parent')
 });

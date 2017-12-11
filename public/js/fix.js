@@ -672,7 +672,7 @@ $(document).ready(function () {
             error: function (err) { },
         })
     }
-
+    console.log(top.location==self.location,'parent')
     function sendmessage(id, userid, name, ti, callback) {
         var titles = ti || '车修申请'
         let str = 'http://jct.chease.cn' + '/fix_detail?applyid=' + id;
@@ -691,7 +691,13 @@ $(document).ready(function () {
                 if (ti) {
                     callback();
                 } else {
-                    top.location = '/fix_detail?applyid=' + id + '&my=true'
+                    // if(window.parent)
+                    if(top.location==self.locatio){
+                        top.location = '/fix_detail?applyid=' + id + '&my=true'
+                    }else {
+                        window.parent.history.go(0)
+                    }
+                    
                 }
 
             },
@@ -700,7 +706,11 @@ $(document).ready(function () {
                 if (ti) {
                     callback();
                 } else {
-                    top.location = '/fix_detail?applyid=' + id + '&my=true'
+                    if(top.location==self.locatio){
+                        top.location = '/fix_detail?applyid=' + id + '&my=true'
+                    }else {
+                        window.parent.history.go(0)
+                    }
                 }
             }
         })

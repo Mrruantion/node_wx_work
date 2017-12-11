@@ -142,6 +142,7 @@ router.get('/add_apply', function (req, res, next) {
         // console.log(spstatus_data, 'dfd')
         // if (applyid) {
         // console.log(spstatus_data,'ddddddd')
+        // let i = 0;
         spstatus_data.forEach(ele => {
             if (ele) {
                 let _sop = {
@@ -149,7 +150,8 @@ router.get('/add_apply', function (req, res, next) {
                     uid: ele.id,
                     apply_id: applyid,
                     cre_tm: _cre_tm,
-                    isagree: 0
+                    isagree: 0,
+                    sp_status: 1,
                 }
                 if (ele.role == "科所队领导") {
                     _sop.status = 1
@@ -178,8 +180,10 @@ router.get('/add_apply', function (req, res, next) {
                 let sstr = 'INSERT INTO ga_spstatus(' + stext.join(',') + ') VALUES(' + sval_str + ')'
                 // if()
                 console.log(sstr)
+                
                 db.query(sstr, function (err, sres) {
                     console.log(sres, 'res')
+                    res.json(applyid)
                 })
             } else {
                 // if (form.role == '局领导') {
@@ -195,14 +199,15 @@ router.get('/add_apply', function (req, res, next) {
         if (!spstatus_data.length) {
             if (form.role == '局领导') {
                 console.log('ddd,')
-                let sstr = 'INSERT INTO ga_spstatus(id,status,isagree,uid,cre_tm,apply_id) VALUES("0","1","1","' + form.uid + '","' + form.cre_tm + '","' + applyid + '")'
+                let sstr = 'INSERT INTO ga_spstatus(id,status,isagree,uid,cre_tm,apply_id,sp_status) VALUES("0","1","1","' + form.uid + '","' + form.cre_tm + '","' + applyid + '","5")'
                 console.log(sstr, 'res')
                 db.query(sstr, function (err, sres) {
-                    console.log(err, sstr, 'res')
+                    console.log(err, sstr, 'res');
+                    res.json(applyid)
                 })
             }
         }
-        res.json(applyid)
+        
         // }
 
 
@@ -220,7 +225,9 @@ router.get('/getapply_list', function (req, res, next) {
     let query = req.query;
 
     // let sql = 'select * from ga_apply where id = ' + query.applyid;
-    let sql = 'select a.*,b.* from (select * ,ga_apply.id as aid, ga_apply.name as aname from ga_apply where id = ' + query.applyid + ') as a left join (select *,ga_user.id as usid,ga_user.name as uname,ga_user.status as ustatus from ga_user where id > 0) as b on a.uid = b.id'
+    let sql = 'select a.*,b.* ,c.* from (select * ,ga_apply.id as aid, ga_apply.name as aname,ga_apply.cre_tm as acre_tm from ga_apply where id = ' + query.applyid + ') as a '
+        + 'left join (select *,ga_user.id as usid,ga_user.name as uname,ga_user.status as ustatus from ga_user where id > 0) as b on a.uid = b.id'
+        + ' left join (select *,ga_depart.id as did,ga_depart.name as dname,ga_depart.note as dnote from ga_depart where id > 0) as c on a.depart = c.id'
     // let sql = ' select * from ga_apply where id = ' + query.applyid 
     let _r_o = {};
     db.query(sql, function (err, row) {
@@ -228,7 +235,7 @@ router.get('/getapply_list', function (req, res, next) {
         _r_o.apply = row;
 
         // let sql2 = 'select * from ga_spstatus where apply_id = ' + query.applyid;
-        let sql2 = "select a.*,b.* from (select * ,ga_spstatus.id As sid,ga_spstatus.status As sstatus from ga_spstatus where apply_id = " + query.applyid + ") as a left join ga_user as b on a.uid = b.id";
+        let sql2 = "select a.*,b.* from (select * ,ga_spstatus.id As sid,ga_spstatus.cre_tm As scre_tm,ga_spstatus.status As sstatus from ga_spstatus where apply_id = " + query.applyid + ") as a left join ga_user as b on a.uid = b.id order by a.status";
         console.log(sql2, 2)
         db.query(sql2, function (err, rows) {
             console.log(err, rows, 'ddfd');
@@ -363,8 +370,6 @@ router.get('/audit_list', function (req, res, next) {
         } else {
             res.json(data)
         }
-
-        // 
     })
 })
 
@@ -458,9 +463,18 @@ router.get('/up_apply', function (req, res, next) {
     var db = req.con;
     var query = req.query;
     let str = 'UPDATE ga_apply SET etm=' + query.etm + ',is_sh = 2 WHERE id=' + query.id;
+
     db.query(str, function (err, row) {
         console.log(row);
-        res.json(row)
+        if (query.sp_status) {
+            let str2 = 'update ga_spstatus set sp_status = ' + query.sp_status + ' where apply_id = ' + query.id
+            db.query(str2, function (error, rows) {
+                res.json(row)
+            })
+        } else {
+            res.json(row)
+        }
+
 
     })
     // console.log(str)
@@ -476,10 +490,19 @@ router.get('/agree_apply', function (req, res, next) {
         if (query.isagree == 2) {
             let str1 = 'update ga_apply set etm = ' + query.etm + ' where id = ' + query.applyid;
             db.query(str1, function (error, ros) {
-                res.json(row);
+                let str2 = 'update ga_spstatus set sp_status = ' + query.sp_status + ' where apply_id = ' + query.applyid
+                db.query(str2, function (error1, row1) {
+                    res.json(row);
+                })
             })
         } else {
-            res.json(row);
+            // res.json(row);
+            if (query.sp_status) {
+                let str2 = 'update ga_spstatus set sp_status = ' + query.sp_status + ' where apply_id = ' + query.applyid
+                db.query(str2, function (error1, row1) {
+                    res.json(row);
+                })
+            }
         }
 
     })
