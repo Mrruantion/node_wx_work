@@ -497,11 +497,14 @@ router.get('/agree_apply', function (req, res, next) {
             })
         } else {
             // res.json(row);
+            // let str1 = 'update ga_spstatus set agress'
             if (query.sp_status) {
                 let str2 = 'update ga_spstatus set sp_status = ' + query.sp_status + ' where apply_id = ' + query.applyid
                 db.query(str2, function (error1, row1) {
                     res.json(row);
                 })
+            }else {
+                res.json(row);
             }
         }
 

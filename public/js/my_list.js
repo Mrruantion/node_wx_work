@@ -168,13 +168,16 @@ $(document).ready(function () {
                     _status = 4;
                 }
                 let _userid = null;
+                let _userid2 = null;
                 let _sid = null;
                 let d_op = {};
                 if (!res.spstatus[0].isagree) {
                     _userid = res.spstatus[0].userid;
+                    _userid2 = res.spstatus[1].userid
                     _sid = res.spstatus[0].sid
                 } else if (!res.spstatus[1].isagree) {
                     _userid = res.spstatus[1].userid
+                    _userid2 = res.spstatus[2].userid
                     _sid = res.spstatus[1].sid
                 } else if (!res.spstatus[2].isagree) {
                     _userid = res.spstatus[2].userid
@@ -192,11 +195,11 @@ $(document).ready(function () {
                     d_op.isagree = 1;
                     d_op.applyid = _g.applyid;
                     let _senid = res.apply[0].aid
-                    getJson('./agree_apply', function (res) {
+                    getJson('./agree_apply', function (result) {
                         // console.log(res);
                         // history.go(0)
                         if (_user.user.role != '局领导') {
-                            sendmessage(_senid, _userid, username)
+                            sendmessage(_senid, _userid2, username)
                         } else if (_user.user.role == '局领导') {
                             sendmessage(_senid, res.apply[0].userid, username, '审批通过')
                             // history.back();
@@ -207,7 +210,7 @@ $(document).ready(function () {
                     let _senid = res.apply[0].aid;
                     let re_etm = ~~(new Date().getTime() / 1000);
 
-                    getJson('./agree_apply', function (res) {
+                    getJson('./agree_apply', function (result) {
                         // console.log(res);
                         sendmessage(_senid, res.apply[0].userid, username, '审批驳回')
                         // history.go(0)

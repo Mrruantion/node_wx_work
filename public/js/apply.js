@@ -402,12 +402,20 @@ $(document).ready(function () {
         console.log(res, 'res')
         let auditer = res.filter(ele => { return ele.role == '科所队领导' || ele.role == '局领导' || ele.role == '警务保障室领导' })
         console.log(auditer)
-        let k_l = res.filter(ele => { return ele.role == '科所队领导' })
-        let j_l = res.filter(ele => { return ele.role == '警务保障室领导' });
-        let ju_l = res.filter(ele => { return ele.role == '局领导' });
+        // let k_l = res.filter(ele => { return ele.role == '科所队领导' })
+        // let j_l = res.filter(ele => { return ele.role == '警务保障室领导' });
+        // let ju_l = res.filter(ele => { return ele.role == '局领导' });
+        var k_l = [], j_l = [], ju_l = [];
+        if (form_option.night > 0 || is_kq) {
+            k_l = res.filter(ele => { return ele.role == '科所队领导' })
+            j_l = res.filter(ele => { return ele.role == '警务保障室领导' });
+            ju_l = res.filter(ele => { return ele.role == '局领导' });
+        } else {
+            k_l = res.filter(ele => { return ele.role == '科所队领导' })
+        }
         apend_data = [k_l[0], j_l[0], ju_l[0]];
-        if(_user.user.role == '科所队领导'){
-            apend_data = [k_l[0]]
+        if (_user.user.role == '科所队领导') {
+            apend_data = [k_l[0], null, null]
         }
         // $('#add_auditer').empty();
         show_auditer(apend_data)
@@ -610,7 +618,7 @@ $(document).ready(function () {
             // console.log(res)
             weui.alert('提交成功', function () {
                 sendmessage(res, apend_data[0].userid, _user.user.name)
-                
+
             });
         }, push_op)
 
@@ -669,5 +677,5 @@ $(document).ready(function () {
             }
         })
     }
-    console.log(window.parent.location,'parent')
+    console.log(window.parent.location, 'parent')
 });

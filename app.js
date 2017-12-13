@@ -10,7 +10,8 @@ var ejs = require('ejs');
 var _index = require('./routes/index');
 var apply = require('./routes/apply');
 var fix = require('./routes/fix');
-var pc = require('./routes/pc')
+var pc = require('./routes/pc');
+var mysql_api = require('./routes/mysql_api')
 // var oil_stat = require('./routes/oil_stat');
 // var trip_stat = require('./routes/trip_stat');
 // var trip_record = require('./routes/trip_record')
@@ -58,6 +59,7 @@ app.use('/', _index);
 app.use('/apply', apply);
 app.use('/fix_apply', fix)
 app.use('/pc', pc)
+app.use('/mysql_api',mysql_api)
 // app.use('/grid',_index)
 // app.use('/trip_record',trip_record);
 

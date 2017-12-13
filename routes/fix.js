@@ -284,6 +284,8 @@ router.get('/update_apply2_spstatus', function (req, res, next) {
                         db.query(str3,function(err3,row3){
                             res.json(row2)
                         })
+                    }else {
+                        res.json(row2)
                     }
                     
                 })
@@ -294,10 +296,12 @@ router.get('/update_apply2_spstatus', function (req, res, next) {
                     db.query(str3,function(err3,row3){
                         res.json(row1)
                     })
+                }else {
+                    res.json(row1)
                 }
             }
         })
     })
-    console.log(str, '\n', str1, '\n', str2)
+    // console.log(str, '\n', str1, '\n', str2)
 })
 module.exports = router;
