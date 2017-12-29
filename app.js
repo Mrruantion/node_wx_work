@@ -56,6 +56,7 @@ app.use(function (req, res, next) {
 });
 
 app.use('/', _index);
+// app.use('/vehicle_accident', _index);
 app.use('/apply', apply);
 app.use('/fix_apply', fix)
 app.use('/pc', pc)
