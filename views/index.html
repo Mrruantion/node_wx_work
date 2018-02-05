@@ -44,8 +44,7 @@
                                     <p class="weui-grid__label">事故申报</p>
                                 </a>
 
-                                <a href="https://open.weixin.qq.com/connect/oauth2/authorize?appid=wwb0e4ffce3f6d8a8f&redirect_uri=http://h5.bibibaba.cn/qy_oauth2.php&response_type=code&scope=snsapi_userinfo&agentid=1000002&state=STATE#wechat_redirect"
-                                    class="weui-grid" id="fix_car">
+                                <a href="/?again=true" class="weui-grid" id="fix_car">
                                     <div class="weui-grid__icon">
                                         <!-- <img src="./img/car.png" alt=""> -->
                                         <i class="icon iconfont icon-dingbu_zhongxindenglu" style="color:#0797bb;font-size:26px"></i>
@@ -157,6 +156,22 @@
 
                         <!-- 车队还车 -->
                         <div class="weui-tab__content b_c_w" id="back_list">
+                            <div class="page__bd">
+                                <div class="weui-search-bar" id="searchBar1">
+                                    <form class="weui-search-bar__form">
+                                        <div class="weui-search-bar__box">
+                                            <i class="weui-icon-search"></i>
+                                            <input type="search" class="weui-search-bar__input" placeholder="搜索" required="" id="search_list1">
+                                            <a href="javascript:" class="weui-icon-clear"></a>
+                                        </div>
+                                        <label class="weui-search-bar__label">
+                                            <i class="weui-icon-search"></i>
+                                            <span>搜索</span>
+                                        </label>
+                                    </form>
+                                    <a href="javascript:" class="weui-search-bar__cancel-btn f15" style="color:#1e7eaf;">取消</a>
+                                </div>
+                            </div>
                             <div class="weui-tab2 h_93 b_c_w" id="tab2">
                                 <div class="weui-navbar2">
                                     <div class="weui-navbar__item2">还车</div>
@@ -221,14 +236,18 @@
 
     <script type="text/javascript" src="./js/index.js"></script>
     <script type="text/javascript">
-        var _g = W.getSearch();
-        if (_g.UserId) {
-            W.setCookie('userid', _g.UserId, 2);
-        }
-        let userid = W.getCookie('userid');
-        if (!userid) {
-            top.location = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wwb0e4ffce3f6d8a8f&redirect_uri=http://h5.bibibaba.cn/qy_oauth2.php&response_type=code&scope=snsapi_userinfo&agentid=1000002&state=STATE#wechat_redirect'
-        }
+        // var _g = W.getSearch();
+        // var userid = W.getCookie('userid');
+        // if(!userid){
+        //     top.location = './login1'
+        // }
+        // if (_g.UserId) {
+        //     W.setCookie('userid', _g.UserId, 2);
+        // }
+        // let userid = W.getCookie('userid');
+        // if (!userid) {
+        //     top.location = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wwb0e4ffce3f6d8a8f&redirect_uri=http://h5.bibibaba.cn/qy_oauth2.php&response_type=code&scope=snsapi_userinfo&agentid=1000002&state=STATE#wechat_redirect'
+        // }
     </script>
     <!-- <script src="./js/example.js"></script> -->
 </body>

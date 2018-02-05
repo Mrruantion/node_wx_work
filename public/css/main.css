@@ -384,6 +384,12 @@ check::before,check::after{
 .p_r {
     position: relative
 }
+.d_i_b {
+    display: inline-block;
+}
+.m_r20 {
+    margin-right: 20px
+}
 .slh {
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -499,4 +505,14 @@ check::before,check::after{
 .totalSize span {
     color: #0073A9;
     margin: 0 5px;
+}
+.weui_cell_replace {
+    padding: 10px 15px;
+    position: relative;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
 }

@@ -4,7 +4,7 @@ $(document).ready(function () {
     function beta() {
         var _g = W.getSearch();
         console.log(_g)
-        var _user = JSON.parse(localStorage.getItem('user1'));
+        var _user = JSON.parse(sessionStorage.getItem('user'));
         var _val = $('input[name="order"]:checked').val();
         var _apply2 = {
             option: {},
@@ -18,7 +18,7 @@ $(document).ready(function () {
         var sqrid = '';
         var repairdepart = []; //存储维修厂
         var isover = false;
-        var bxq = '';
+        // var bxq = '';
         var role = {
             9: '民警',
             12: '部门领导',
@@ -33,6 +33,7 @@ $(document).ready(function () {
             console.log(data)
             reapplyform = data;
             var _wxlx = data.WXLX.split('');
+            $('input[name="order"]')[data.TYPE || 0].checked = true;
             $('#fdj').prop('checked', _wxlx.indexOf('A') > -1)
             $('#dp').prop('checked', _wxlx.indexOf('B') > -1)
             $('#dl').prop('checked', _wxlx.indexOf('C') > -1)
@@ -181,11 +182,13 @@ $(document).ready(function () {
         //输入车牌后获取信息
         function vehicleMessage(name) {
             wistorm_api._list('vehicle', { name: name }, '', '', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), true, function (veh) {
-                veh.data[0] ? wistorm_api._list('department', { objectId: veh.data[0].departId }, '', '', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), true, function (dep) {
-                    veh.data[0].department = dep.data[0];
-                    // console.log(veh.data, 'dep')
-                    showVehicleMessage(veh.data[0])
-                }) : showVehicleMessage()
+                veh.data[0] ?
+                    (veh.data[0].departId ?
+                        wistorm_api._list('department', { objectId: veh.data[0].departId }, '', '', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), true, function (dep) {
+                            veh.data[0].department = dep.data[0];
+                            // console.log(veh.data, 'dep')
+                            showVehicleMessage(veh.data[0])
+                        }) : null) : showVehicleMessage()
             })
         }
 
@@ -270,9 +273,10 @@ $(document).ready(function () {
                     // if (ele.responsibility.indexOf('4') > -1) {
                     wistorm_api.getUserList({ objectId: ele.uid }, 'objectId,username,authData,createdAt', '-createdAt', '-createdAt', 0, 0, -1, W.getCookie('auth_code'), function (json) {
                         ele.user = json.data[0];
-                        ksd_arr.push(ele);
+                        // ksd_arr.push(ele);
                         i++;
                         if (i == emp.data.length) {
+                            ksd_arr = emp.data;
                             // console.log(ksd_arr, 'ksd_arr')
                             // selectAuditer(ksd_arr)
                         }
@@ -390,33 +394,33 @@ $(document).ready(function () {
             });
         })
         //保修期
-        function Warranty(defalut) {
-            if (defalut) {
-                $('#bxq .weui-cell__ft').empty();
-                $('#bxq .weui-cell__ft').text(defalut);
-                $('#bxq .weui-cell__ft').css({ color: '#000' });
-            }
-            $('#bxq').on('click', function () {
-                var defal = defalut ? defalut.split('-') : [new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()]
-                weui.datePicker({
-                    start: new Date(),
-                    end: new Date().getFullYear() + 10,
-                    defaultValue: defal,
-                    onConfirm: function (result) {
-                        var date = '';
-                        var val = '';
-                        result.forEach((ele, index) => {
-                            date += ele.label;
-                            index < 2 ? val += ele.value + '-' : val += ele.value
-                        })
-                        bxq = val;
-                        $('#bxq .weui-cell__ft').empty();
-                        $('#bxq .weui-cell__ft').text(date);
-                        $('#bxq .weui-cell__ft').css({ color: '#000' });
-                    }
-                });
-            })
-        }
+        // function Warranty(defalut) {
+        //     if (defalut) {
+        //         $('#bxq .weui-cell__ft').empty();
+        //         $('#bxq .weui-cell__ft').text(defalut);
+        //         $('#bxq .weui-cell__ft').css({ color: '#000' });
+        //     }
+        //     $('#bxq').on('click', function () {
+        //         var defal = defalut ? defalut.split('-') : [new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()]
+        //         weui.datePicker({
+        //             start: new Date(),
+        //             end: new Date().getFullYear() + 10,
+        //             defaultValue: defal,
+        //             onConfirm: function (result) {
+        //                 var date = '';
+        //                 var val = '';
+        //                 result.forEach((ele, index) => {
+        //                     date += ele.label;
+        //                     index < 2 ? val += ele.value + '-' : val += ele.value
+        //                 })
+        //                 bxq = val;
+        //                 $('#bxq .weui-cell__ft').empty();
+        //                 $('#bxq .weui-cell__ft').text(date);
+        //                 $('#bxq .weui-cell__ft').css({ color: '#000' });
+        //             }
+        //         });
+        //     })
+        // }
 
         //添加明细
         $('#add_repairInfo').on('click', function () {
@@ -428,7 +432,7 @@ $(document).ready(function () {
             $('#container').hide();
             $('#repair_info').show();
             $('#clmx_delete').hide();
-            Warranty(bxq)
+            // Warranty(bxq)
             var state = { 'page_id': 1, 'user_id': 5 };
             var title = '添加明细';
             var url = 'fix_apply#add_repair';
@@ -450,7 +454,7 @@ $(document).ready(function () {
             $('#clje').val('');
             $('#wxbz').val('');
             $('#bxq1').val('');
-            bxq = '';
+            // bxq = '';
             $('#bxq .weui-cell__ft').empty();
             $('#bxq .weui-cell__ft').text('请选择');
             $('#bxq .weui-cell__ft').css({ color: '#ccc' });
@@ -464,12 +468,22 @@ $(document).ready(function () {
                 sorts: 'ID'
             }, function (res) {
                 console.log(res, 'dfd')
-                var now = [new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()]
-                console.log(now.join('-'))
+                debugger;
+                var now = new Date().format('yyyy-MM-dd');
+
+                // var now = [new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()]
+                // console.log(now.join('-'))
+                // new Date().format('yyyy-MM-dd')
 
                 for (var i = 0; i < res.data.length; i++) {
-                    if (res.data[i].BXQ > now.join('-')) {
-                        weui.alert('该零件上次更换还在保修期，请备注说明更换原因');
+                    var pass = res.data[i].CRE_TM ? res.data[i].CRE_TM.split('-') : null;
+                    var month = parseInt(pass[1]) + parseInt(res.data[i].BXQ);
+                    if (month > 12) {
+                        pass[1] = month - 13;
+                        pass[0] = parseInt(pass[0]) + 1;
+                    }
+                    if (pass.join('-') > now) {
+                        weui.alert('该零件在' + res.data[i].CRE_TM + '更换过，保修期为' + res.data[i].BXQ + '个月，还在保修期，请备注说明更换原因');
                         break;
                     }
                 }
@@ -528,7 +542,7 @@ $(document).ready(function () {
             clmx_option.JE = $('#clje').val();
             clmx_option.LB = $('input[name="lb"]:checked').val();
             clmx_option.REMARK = $('#wxbz').val();
-            clmx_option.BXQ = bxq;
+            clmx_option.BXQ = $('#bxq1').val();
             // if(!bxq)
             if (clmx_option.LB == 2) {
                 if (!clmx_option.XMMC) {
@@ -541,6 +555,10 @@ $(document).ready(function () {
                 }
                 if (!clmx_option.DJ) {
                     weui.alert('请填写单价');
+                    return false;
+                }
+                if (!clmx_option.BXQ) {
+                    weui.alert('请输入保修期');
                     return false;
                 }
             } else {
@@ -648,8 +666,9 @@ $(document).ready(function () {
                     $('#cldj').val(_thisArr.DJ);
                     $('#clje').val(_thisArr.JE);
                     $('#wxbz').val(_thisArr.REMARK);
-                    bxq = _thisArr.BXQ;
-                    Warranty(_thisArr.BXQ)
+                    $('#bxq1').val(_thisArr.BXQ)
+                    // bxq = _thisArr.BXQ;
+                    // Warranty(_thisArr.BXQ)
 
                 })
                 $('#delete_' + index).on('click', function () {
@@ -751,6 +770,7 @@ $(document).ready(function () {
 
 
             _apply2.option.WXLX = _checkVal.join('');
+            _apply2.option.TYPE = $('input[name="order"]:checked').val();
             _apply2.option.SQR = $('#applyer').val()
             _apply2.option.SQSJ = W.dateToString(new Date());
 
@@ -845,14 +865,18 @@ $(document).ready(function () {
                 ele.responsibility.indexOf('1') > -1 ? _index = index : index == 0 ? _index = index : ''
                 var tr_content = `
                     <div class="weui-cell weui-cell_access" >
-                        <input type="checkbox" style="margin-right:5px" value=${index} name='add' id=${_id} ` + (ele.responsibility.indexOf('1') > -1 ? checked : index == 0 ? checked : '') + `/>
+                        <input type="checkbox" style="margin-right:5px" value=${ele.user.username} name='add' id=${_id} ` + (ele.responsibility.indexOf('1') > -1 ? checked : index == 0 ? checked : '') + `/>
+                       
                         <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                            <img src="js/merge/img/1.png" style="width: 50px;display: block">
+                            <img src="/img/1.png" style="width: 50px;display: block">
                         </div>
                         <div class="weui-cell__bd">
-                            <p>`+ ele.name + `</p>
-                            <p style="font-size: 13px;color: #888888;">`+ role[ele.role] + `</p>
+                            <label for=${_id}>
+                                <p>`+ ele.name + `</p>
+                                <p style="font-size: 13px;color: #888888;">`+ role[ele.role] + `</p>
+                            </label>
                         </div>
+                       
                     </div>
                 `
                 $('#nextAuditer').append(tr_content);
@@ -894,8 +918,9 @@ $(document).ready(function () {
                                 table: 'ga_repairinfo'
                             }, function (del) {
                                 var i = 0;
+                                var CRE_TM = new Date().format('yyyy-MM-dd');
                                 repairinfo_arr.forEach(ele => {
-                                    var creatop = Object.assign({}, ele, { XLH: _g.applyid, VEHICLE: apply_json.HPHM });
+                                    var creatop = Object.assign({}, ele, { XLH: _g.applyid, VEHICLE: apply_json.HPHM, CRE_TM: CRE_TM });
                                     W.$ajax('mysql_api/create', {
                                         json_p: creatop,
                                         table: 'ga_repairinfo'
@@ -912,11 +937,13 @@ $(document).ready(function () {
                                                 }, function (_sps) {
                                                     var j = 0;
                                                     _auditer.forEach(ele => {
-                                                        sendmessage(_g.applyid, data[ele].user.username, apply_json.SQR, '', 2, function () {
+                                                        sendmessage(_g.applyid, ele, apply_json.SQR, '', 2, function () {
                                                             j++
                                                             if (j == _auditer.length) {
-                                                                sendmessage(_g.applyid, sqrid, apply_json.SQR, '', 2, function () {
-                                                                    top.location = '/repaircar_detail?applyid=' + _g.applyid + '&my=true'
+                                                                sqrid = sqrid ? sqrid : _user.user.username
+                                                                sendmessage(_g.applyid, sqrid, apply_json.SQR, '', 1, function () {
+                                                                    // top.location = '/repaircar_detail?applyid=' + _g.applyid + '&my=true'
+                                                                    top.location = '/fix_detail?applyid=' + _g.applyid + '&my=true'
                                                                 })
                                                             }
                                                         })
@@ -951,10 +978,10 @@ $(document).ready(function () {
                                         }, function (_sps) {
                                             var j = 0;
                                             _auditer.forEach(ele => {
-                                                sendmessage(res.id, data[ele].user.username, apply_json.SQR, '', 2, function () {
+                                                sendmessage(res.id, ele, apply_json.SQR, '', 2, function () {
                                                     j++
                                                     if (j == _auditer.length) {
-                                                        sendmessage(_g.applyid, sqrid, apply_json.SQR, '', 2, function () {
+                                                        sendmessage(res.id, sqrid, apply_json.SQR, '', 2, function () {
                                                             top.location = '/fix_detail?applyid=' + res.id + '&my=true'
                                                         })
                                                     }

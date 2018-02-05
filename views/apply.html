@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover">
-    <title>用车</title>
+    <title>用车申请</title>
     <link rel="stylesheet" href="./css/weui.css" />
     <link rel="stylesheet" href="./css/example.css" />
     <link rel="stylesheet" href="./css/main.css" />
@@ -130,14 +130,30 @@
                     <div class="weui-cell__ft">请选择</div>
                 </div>
             </div>
+            <!-- 局领导专用 -->
             <div class="weui-cells tip" style="display:none">
-                <div class="weui-cell weui-cell_access f12" id="address2">
+                <div class="weui_cell_replace weui-cell_access f12" id="address2">
                     <div class="weui-cell__bd">
-                        <span style="vertical-align: middle">地址</span>
+                        <!-- <span style="vertical-align: middle">地址</span> -->
                     </div>
                     <div class="weui-cell__bd t_a_r" style="flex:4">
-                        <input type="radio" value="温州市区内" name="address2" checked style="position: relative;top: 2px; margin-right: 5px;" />温州市区内
-                        <input type="radio" value="温州市区外" name="address2" style="position: relative;top: 2px; margin-right: 5px;" />温州市区外(出差)
+                        <input id="rui" type="radio" value="瑞安区域" name="address2" checked style="position: relative;top: 2px; margin-right: 5px;"
+                        />
+                        <label for="rui">瑞安区域</label>
+                    </div>
+                </div>
+                <div class="weui_cell_replace weui-cell_access f12" id="address2">
+                    <div class="weui-cell__bd"><span style="vertical-align: middle">地址</span> </div>
+                    <div class="weui-cell__bd t_a_r" style="flex:4">
+                        <input id="wen" type="radio" value="温州区域" name="address2" style="position: relative;top: 2px; margin-right: 5px;" />
+                        <label for="wen">温州区域</label>
+                    </div>
+                </div>
+                <div class="weui_cell_replace weui-cell_access f12" id="address2">
+                    <div class="weui-cell__bd"> </div>
+                    <div class="weui-cell__bd t_a_r" style="flex:4">
+                        <input id="cwen" type="radio" value="出温州区域" name="address2" style="position: relative;top: 2px; margin-right: 5px;" />
+                        <label for="cwen">出温州区域</label>
                     </div>
                 </div>
             </div>

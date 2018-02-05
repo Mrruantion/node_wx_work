@@ -3,60 +3,28 @@ $(document).ready(function () {
 
 
     function beta() {
-        // console.log(1)
+
         var _g = W.getSearch();
-        var _user = JSON.parse(localStorage.getItem('user'));
+        var _user = JSON.parse(sessionStorage.getItem('user'));
         window._user = _user;
         var sendname = '';
         var historyRepairinfo = [];
         var hqry = [];
         var deletefirst = null;
-        var lc = {
-            1: '维修申请',
-            2: '科所队领导审批',
-            3: '专管员审批',
-            4: '警务保障室领导审批',
-            6: '局领导审批',
-            9: '维修信息录入',
-            0: '待报销',
-            A: '已结束'
-        }
-        var role = {
-            1: '科所队领导',
-            2: '后勤科领导',
-            3: '局领导',
-            4: '专管员'
-        }
+
+        var role = defalut.repairrole;
+        var wx = defalut.repair._wx;
+        var _LB = defalut.repair._LB;
+        var _HPZL = defalut.repair._HPZL;
+        var app_state = defalut.repair.STATE;
+
         var role1 = {
             9: '普通成员',
             12: '部门领导',
             13: '公司领导'
 
         }
-        var wx = {
-            A: '发动机',
-            B: '地盘',
-            C: '电路',
-            D: '轮胎',
-            E: '外壳',
-            Z: '其他',
-        }
-        var app_state = {
-            0: '撤销',
-            1: '审批中',
-            3: '明细录入',
-            4: '审批驳回',
-            5: '待报销',
-            6: '已结束'
-        }
-        var _HPZL = {
-            '01': '大型汽车',
-            '02': '小型汽车'
-        }
-        var _LB = {
-            1: '工时费',
-            2: '材料费'
-        }
+
         if (_user) {
             get_apply2()
         } else {
@@ -71,20 +39,39 @@ $(document).ready(function () {
                         W.setCookie('app_secret', res.wistorm.app_secret);
                         W.setCookie('auth_code', res.access_token);
                         wistorm_api.getUserList({ username: _g.userid }, 'objectId,username,authData,createdAt', '-createdAt', '-createdAt', 0, 0, -1, W.getCookie('auth_code'), function (json) {
-                            _user.user = json.data[0];
-                            wistorm_api._list('employee', { uid: _user.user.objectId }, '', '', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), true, function (emp) {
-                                _user.employee = emp.data[0];
-                                wistorm_api._list('department', { objectId: _user.employee.departId }, '', '', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), true, function (dep) {
-                                    _user.depart = dep.data[0];
-                                    // mainContral(_user)
-                                    get_apply2()
+                            if (json.data[0]) {
+                                _user.user = json.data[0];
+                                wistorm_api._list('employee', { uid: _user.user.objectId }, '', '', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), true, function (emp) {
+                                    _user.employee = emp.data[0];
+                                    if (emp.data[0]) {
+                                        if (emp.data[0].roleId) {
+                                            wistorm_api._list('role', { objectId: emp.data[0].roleId }, '', '-createdAt', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), false, function (roles) {
+                                                // console.log(roles)
+                                                _user.employee.rolename = roles.data[0] ? roles.data[0].name.trim() : null;
+                                                wistorm_api._list('department', { objectId: _user.employee.departId }, '', '', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), true, function (dep) {
+                                                    _user.depart = dep.data[0];
+                                                    sessionStorage.setItem('user', JSON.stringify(_user))
+                                                    get_apply2()
+                                                })
+                                            })
+                                        } else {
+                                            wistorm_api._list('department', { objectId: _user.employee.departId }, '', '', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), true, function (dep) {
+                                                _user.depart = dep.data[0];
+                                                sessionStorage.setItem('user', JSON.stringify(_user))
+                                                get_apply2()
+                                            })
+                                        }
+                                    }
                                 })
-                            })
+                            } else {
+                                top.location = '/login1'
+                            }
                         })
                     }
                 })
             }
         }
+
         console.log(_user, 'user')
         // get_apply2()
         function get_apply2() {
@@ -97,7 +84,7 @@ $(document).ready(function () {
                     // console.log(json)
                     res.data[0].department = dep.data[0];
                     gethistory(res.data[0].HPHM)
-                    gethq(res.data[0].SQR)
+                    gethq(res.data[0].SQR) //获取申请人信息
                     // res.data[0].spstatus = res1.data
                     W.$ajax('mysql_api/list', {
                         json_p: { XLH: _g.applyid },
@@ -207,8 +194,8 @@ $(document).ready(function () {
             $('#DEPT').text(apply.department.name);
             $('#SQSJ').text(W.dateToString(W.date(apply.SQSJ)));
             $('#STATE').text(app_state[apply.STATE]);
-            $('#DQLC').text(lc[apply.DQLC]);
-            $('#XGLC').text(lc[apply.XGLC]);
+            $('#DQLC').text(defalut.repair.LC[apply.DQLC]);
+            $('#XGLC').text(defalut.repair.LC[apply.XGLC]);
             $('#WXDW').text(apply.WXDW);
             $('#ZJE').text(apply.ZJE);
             $('#JCRQ').text(apply.JCRQ || '');
@@ -217,8 +204,8 @@ $(document).ready(function () {
             $('#JSR').text(apply.JSR || '');
             $('#WXDWLXDH').text(apply.WXDWLXDH);
             $('#_spstatus').text(app_state[apply.STATE])
-            show_repairinfo(data.repairinfo)
-            show_audit(data.spstatus)
+            show_repairinfo(data.repairinfo) //列出维修明细
+            show_audit(data.spstatus)       //列出审核人明细
         }
 
 
@@ -256,31 +243,39 @@ $(document).ready(function () {
                     // console.log(index)
                     $('#container').hide();
                     $('#repair_info').show();
+                    $('#all_button').hide();
                     // if(!_g.my){
                     //     $('#my_button').hide();
                     // }
                     var state = { 'page_id': 1, 'user_id': 5 };
                     var title = '明细详情';
-                    var url = 'fix_details#details_' + index;
+                    var url = 'fix_detail#details_' + index;
                     history.pushState(state, title, url);
                     window.addEventListener('popstate', function (e) {
                         $('#container').show();
                         $('#repair_info').hide();
-                        history.go(0)
+                        $('#all_button').show();
+                        // history.go(0)
                         // if(_g.my){
                         //     $('#my_button').show();
                         // }
 
                     });
                     var _thisArr = data[index];
-                    var tr1 = ''
+                    var tr1 = '';
+                    var show_historyRepair = [];
                     if (_thisArr.history_arr.length) {
-                        tr1 = `<select style="width:50%;border-radius:2px">`
-                        _thisArr.history_arr.forEach(ele => {
-                            tr1 += `<option>${ele.SQR + '&nbsp;&nbsp;' + W.dateToString(W.date(ele.SQSJ))}</option>`
+                        // tr1 = `<select style="width:50%;border-radius:2px">`
+                        // _thisArr.history_arr.forEach(ele => {
+                        //     tr1 += `<option>${ele.SQR + '&nbsp;&nbsp;' + W.dateToString(W.date(ele.SQSJ))}</option>`
+                        // })
+                        // tr1 += '</select>'
+                        _thisArr.history_arr.forEach((ele, index) => {
+                            var op = { value: index, label: (ele.SQR + '&nbsp;&nbsp;' + W.dateToString(W.date(ele.SQSJ))) }
+                            show_historyRepair.push(op)
                         })
-                        tr1 += '</select>'
                     }
+                    tr1 = '<button id="history_rep" class="btn btn-default" style="margin-left:20px;padding:3px">维修历史</button>'
 
                     console.log(_thisArr, 'ccc')
                     let _lb1;
@@ -292,7 +287,16 @@ $(document).ready(function () {
                     $('#detail_dj').text(_thisArr.DJ);
                     $('#detail_je').text(_thisArr.JE)
                     $('#detail_bxq').text(_thisArr.BXQ)
-                    $('#detail_bz').text(_thisArr.BZ)
+                    $('#detail_bz').text(_thisArr.BZ);
+                    $('#history_rep').on('click', function () {
+                        weui.picker(show_historyRepair, {
+                            defaultValue: [0],
+                            onConfirm: function (result) {
+
+                            },
+                            id: 'wxdw'
+                        });
+                    })
                 })
             });
             if (data.length) {
@@ -332,17 +336,14 @@ $(document).ready(function () {
 
         function operation(data) {
             console.log(data, 'data')
-            sendname = data.SQR
-            if (_user.employee.responsibility.indexOf('4') > -1 && _g.my && data.STATE == 3) {
-                $('#my_button').show();
-                $('#submitAndaudit').show();
-                // if(_user.employee.isInCharge){
-                //     $('#submitAndaudit').show();
-                // }else if(_user.employee.isDriver||_user.depart.name == '修理厂'){
-                //     $('#submitAndaudit').show();
-                // }
-            }
-            if (_user.employee.isDriver || _user.depart.name == '修理厂') {
+            sendname = data.SQR;
+            var spstatus_status = 0;
+
+            // if (_user.employee.responsibility.indexOf('4') > -1 && _g.my && data.STATE == 3) {
+            //     $('#my_button').show();
+            //     $('#submitAndaudit').show();
+            // }
+            if (_user.employee.isDriver || _user.depart.name == '修理厂' || _user.employee.name == data.SQR) { //司机或修理厂
                 if (_g.my && data.STATE == 3) {
                     $('#my_button').show();
                     $('#resubmit').show();
@@ -354,67 +355,40 @@ $(document).ready(function () {
                         }
                     }
                 }
-
             }
-            // if (_user.employee.responsibility.indexOf('2') > -1 && _g.auditing && data.STATE == 1) {
-            //     $('#other_show').show();
-            // }
-            // var firstsp = true;
-
-            // for (var i = 0; i < data.spstatus.length; i++) {
-            //     if (data.spstatus[i].status != 1) {
-            //         firstsp = false;
-            //         break;
-            //     }
-            // }
-
-            if (_g.auditing && data.STATE == 1) {
-                $('#other_button').show();
+            debugger;
+            if (_g.auditing && data.STATE == 1) { //审核中
                 if (data.spstatus.length == 2 && data.SPJB == 13) {
                     $('#zgy').show();
                 }
-                data.spstatus.forEach(ele => {
-                    if (ele.uid == _user.employee.uid && ele.isagree) {
-                        $('#other_button').hide();
-                        $('#zgy').hide()
+                if (data.DQLC == 2) {
+                    if (_user.employee.role == 12 && _user.employee.departId == data.DEPT && (!_user.employee.rolename || _user.employee.rolename == '部门领导')) {
+                        spstatus_status = 1
+                        $('#other_button').show();
                     }
-                })
-
-
+                } else if (data.DQLC == 4) {
+                    if (_user.employee.role == 12 && _user.employee.rolename == '警务保障室领导') {
+                        spstatus_status = 2
+                        $('#other_button').show();
+                    }
+                } else if (data.DQLC == 6) {
+                    if (_user.employee.role == 13) {
+                        spstatus_status = 3
+                        $('#other_button').show();
+                    }
+                } else if (data.DQLC == 3) {
+                    if (_user.employee.isInCharge) {
+                        spstatus_status = 4
+                        $('#other_button').show();
+                    }
+                }
             }
 
-            // if (_user.employee.responsibility.indexOf('4') > -1 && _g.my && data.STATE == 5) {
-            //     $('#print_button').show();
-            // }
+
 
             var is_zgy = $('input[name="zgy1"]:checked').val()
 
-            //确认提交审批
-            $('#submitAndaudit').on('click', function () {
-                console.log($('input[name="istake"]:checked').val(), 'd')
-                console.log(hqry, 'hqry')
-                wistorm_api._list('department', { uid: _user.employee.companyId, objectId: _user.employee.departId }, '', '', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), true, function (dep) {
-                    wistorm_api._list('employee', { departId: dep.data[0].objectId, role: 12 }, '', '', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), true, function (emp) {
-                        var i = 0;
-                        emp.data.forEach(ele => {
-                            wistorm_api.getUserList({ objectId: ele.uid }, 'objectId,username,authData,createdAt', '-createdAt', '-createdAt', 0, 0, -1, W.getCookie('auth_code'), function (json) {
-                                ele.user = json.data[0]
-                                i++;
-                                if (i == emp.data.length) {
-                                    console.log(emp.data, data, 'ddgd')
-                                    if (data.SPJB == 11) {
-                                        selectAuditer(emp.data, 1, true)
-                                    } else {
-                                        selectAuditer(emp.data, 1)
-                                    }
 
-                                }
-                            })
-                        })
-                    })
-                })
-
-            })
             //撤销
             $('#backout').on('click', function () {
                 W.$ajax('mysql_api/update', {
@@ -434,6 +408,7 @@ $(document).ready(function () {
                     })
                 })
             })
+            //重新提交
             $('#resubmit').on('click', function () {
                 top.location = './fix_apply?resubmit=true&applyid=' + _g.applyid
             })
@@ -458,21 +433,22 @@ $(document).ready(function () {
                             table: 'ga_spstatus'
                         }, function (us) {
                             wistorm_api._update('vehicle', { name: data.HPHM }, { status: 0 }, W.getCookie('auth_code'), true, function (veh) {
+                                debugger;
                                 sendmessage(_g.applyid, hqry[0].user.username, data.SQR, '申请通过', 1, function () {
                                     history.go(0)
                                 })
                             })
                         })
                     })
-                } else if (data.SPJB == 12) {
-                    if (_user.employee.role == 12 && _user.depart.isSupportDepart) {
+                } else if (data.SPJB == 12) { //二级审批
+                    if (_user.employee.role == 12 && _user.employee.rolename == "警务保障室领导") {
                         W.$ajax('mysql_api/update', {
                             json_p: { XLH: _g.applyid },
                             update_json: { DQLC: 0, XGLC: 'A', STATE: 5 },
                             table: 'ga_apply2'
                         }, function (res) {
                             W.$ajax('mysql_api/update', {
-                                json_p: { status: 2, apply2_id: _g.applyid },
+                                json_p: { status: spstatus_status, apply2_id: _g.applyid },
                                 update_json: { isagree: 1, uid: _user.user.objectId, sp_tm: newTime },
                                 table: 'ga_spstatus'
                             }, function (res1) {
@@ -496,11 +472,13 @@ $(document).ready(function () {
                                 emp.data.forEach(ele => {
                                     wistorm_api.getUserList({ objectId: ele.uid }, 'objectId,username,authData,createdAt', '-createdAt', '-createdAt', 0, 0, -1, W.getCookie('auth_code'), function (json) {
                                         ele.user = json.data[0]
-                                        i++;
-                                        if (i == emp.data.length) {
-                                            // console.log(emp.data)
-                                            selectAuditer(emp.data, 2, true)
-                                        }
+                                        wistorm_api._list('role', { objectId: ele.roleId }, '', '-createdAt', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), false, function (roles) {
+                                            ele.rolename = roles.data ? roles.data[0].name : null;
+                                            i++;
+                                            if (i == emp.data.length) {
+                                                selectAuditer(emp.data, 2, true)
+                                            }
+                                        })
                                     })
                                 })
                             })
@@ -540,11 +518,13 @@ $(document).ready(function () {
                                     emp.data.forEach(ele => {
                                         wistorm_api.getUserList({ objectId: ele.uid }, 'objectId,username,authData,createdAt', '-createdAt', '-createdAt', 0, 0, -1, W.getCookie('auth_code'), function (json) {
                                             ele.user = json.data[0]
-                                            i++;
-                                            if (i == emp.data.length) {
-                                                console.log(emp.data)
-                                                selectAuditer(emp.data, 2)
-                                            }
+                                            wistorm_api._list('role', { objectId: ele.roleId }, '', '-createdAt', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), false, function (roles) {
+                                                ele.rolename = roles.data ? roles.data[0].name : null;
+                                                i++;
+                                                if (i == emp.data.length) {
+                                                    selectAuditer(emp.data, 2)
+                                                }
+                                            })
                                         })
                                     })
                                 })
@@ -567,6 +547,7 @@ $(document).ready(function () {
                                                 var append_spstatus = {
                                                     id: 0,
                                                     isagree: 0,
+                                                    uid: emp.data[0].uid,
                                                     cre_tm: ~~(new Date().getTime() / 1000),
                                                     apply2_id: _g.applyid,
                                                     sp_status: 1,
@@ -588,13 +569,23 @@ $(document).ready(function () {
                                 wistorm_api._list('employee', { departId: '1', role: 13 }, '', '', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), true, function (emp) {
                                     var i = 0;
                                     emp.data.forEach(ele => {
+                                        // wistorm_api.getUserList({ objectId: ele.uid }, 'objectId,username,authData,createdAt', '-createdAt', '-createdAt', 0, 0, -1, W.getCookie('auth_code'), function (json) {
+                                        //     ele.user = json.data[0];
+                                        //     i++;
+                                        //     if (i == emp.data.length) {
+                                        //         console.log(emp.data)
+                                        //         selectAuditer(emp.data, 3)
+                                        //     }
+                                        // })
                                         wistorm_api.getUserList({ objectId: ele.uid }, 'objectId,username,authData,createdAt', '-createdAt', '-createdAt', 0, 0, -1, W.getCookie('auth_code'), function (json) {
-                                            ele.user = json.data[0];
-                                            i++;
-                                            if (i == emp.data.length) {
-                                                console.log(emp.data)
-                                                selectAuditer(emp.data, 3)
-                                            }
+                                            ele.user = json.data[0]
+                                            wistorm_api._list('role', { objectId: ele.roleId }, '', '-createdAt', '-createdAt', 0, 0, 1, -1, W.getCookie('auth_code'), false, function (roles) {
+                                                ele.rolename = roles.data ? roles.data[0].name : null;
+                                                i++;
+                                                if (i == emp.data.length) {
+                                                    selectAuditer(emp.data, 3)
+                                                }
+                                            })
                                         })
                                     })
                                 })
@@ -604,7 +595,7 @@ $(document).ready(function () {
                 }
 
             })
-            //驳回
+            //驳回（审批不通过）
             $('#reject').on('click', function () {
                 var etm = ~~(new Date().getTime() / 1000)
                 W.$ajax('mysql_api/update', {
@@ -614,8 +605,8 @@ $(document).ready(function () {
                 }, function (res) {
                     console.log(res)
                     W.$ajax('mysql_api/update', {
-                        json_p: { uid: _user.user.objectId },
-                        update_json: { isagree: 2 },
+                        json_p: { apply2: _g.applyid, status: spstatus_status },
+                        update_json: { isagree: 2, uid: _user.employee.uid },
                         table: 'ga_spstatus'
                     }, function (us) {
                         console.log(us)
@@ -624,8 +615,7 @@ $(document).ready(function () {
                             update_json: { sp_status: 0, },
                             table: 'ga_spstatus'
                         }, function (u_s) {
-                            // console.log(u_s)
-
+                            console.log(u_s)
                             wistorm_api._update('vehicle', { name: data.HPHM }, { status: 0 }, W.getCookie('auth_code'), true, function (veh) {
                                 console.log(veh)
                                 sendmessage(_g.applyid, hqry[0].user.username, data.SQR, '申请驳回', 1, function () {
@@ -640,6 +630,9 @@ $(document).ready(function () {
 
         function selectAuditer(data, type, isover) {
             console.log(data, type, 'dfd')
+            if (type == 2) {
+                data = data.filter(ele => ele.rolename && ele.rolename == '警务保障室领导')
+            }
             $('#nextAuditer').empty();
             var append_spstatus = {};
             var sendid = null;
@@ -647,49 +640,40 @@ $(document).ready(function () {
             data.forEach((ele, index) => {
                 var _id = 'add' + index;
                 var checked = 'checked';
-                ele.responsibility.indexOf('1') > -1 ? _index = index : index == 0 ? _index = index : ''
+                // ele.responsibility.indexOf('1') > -1 ? _index = index : index == 0 ? _index = index : ''
                 var tr_content = `
                     <div class="weui-cell weui-cell_access" >
-                        <input type="radio" style="margin-right:5px" name='add' id=${_id} ` + (ele.responsibility.indexOf('1') > -1 ? checked : index == 0 ? checked : '') + `/>
+                        <input type="checkbox" value=${ele.user.username} style="margin-right:5px" name='select_auditer' id=${_id} />
                         <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                            <img src="js/merge/img/1.png" style="width: 50px;display: block">
+                            <img src="/img/1.png" style="width: 50px;display: block">
                         </div>
                         <div class="weui-cell__bd">
-                            <p>`+ ele.name + `</p>
-                            <p style="font-size: 13px;color: #888888;">`+ role1[ele.role] + `</p>
+                            <label for=${_id}>
+                                <p>`+ ele.name + `</p>
+                                <p style="font-size: 13px;color: #888888;">`+ role1[ele.role] + `</p>
+                            </label>
                         </div>
                     </div>
                 `
                 $('#nextAuditer').append(tr_content);
-                $('#' + _id).on('click', function () {
-                    console.log(index)
-                    append_spstatus = {
-                        id: 0,
-                        isagree: 0,
-                        cre_tm: ~~(new Date().getTime() / 1000),
-                        apply2_id: _g.applyid,
-                        sp_status: 1
-                    }
-                    type == 1 ? append_spstatus.status = 1 : type == 2 ? append_spstatus.status = 2 : type == 3 ? append_spstatus.status = 3 : null;
-                    sendid = data[index].user.username
-                })
             })
 
             append_spstatus = {
                 id: 0,
                 isagree: 0,
+                uid: '',
                 cre_tm: ~~(new Date().getTime() / 1000),
                 apply2_id: _g.applyid,
                 sp_status: 1
             }
             type == 1 ? append_spstatus.status = 1 : type == 2 ? append_spstatus.status = 2 : type == 3 ? append_spstatus.status = 3 : null;
-            sendid = data[_index].user.username;
+            // sendid = data[_index].user.username;
             $('#androidDialog1').fadeIn(200);
             $('#audit_cancle').on('click', function () {
                 $('#androidDialog1').fadeOut(200);
             })
             $('#audit_commit').on('click', function () {
-                // console.log(11)
+                debugger;
                 console.log(append_spstatus, 'spstatus')
                 var update_json = {};
                 if (type == 1) {
@@ -712,8 +696,15 @@ $(document).ready(function () {
                     update_json.DQLC = 6;
                     update_json.XGLC = 0
                 }
-
-                console.log(update_json)
+                // console.log(update_json)
+                var _addauditer = $('input[name="select_auditer"]')
+                var _auditer = []; //推送人id
+                for (var o in _addauditer) {
+                    _addauditer[o].checked ? _auditer.push(_addauditer[o].value) : null
+                }
+                if (!_auditer.length) {
+                    weui.alert('请选择审批人')
+                }
                 W.$ajax('mysql_api/update', {
                     json_p: { XLH: _g.applyid },
                     update_json: update_json,
@@ -724,11 +715,17 @@ $(document).ready(function () {
                             json_p: append_spstatus,
                             table: 'ga_spstatus'
                         }, function (res2) {
-                            sendmessage(_g.applyid, sendid, sendname, '', 2, function () {
-                                history.go(0)
+                            var _i = 0;
+                            _auditer.forEach(ele => {
+                                sendmessage(_g.applyid, ele, sendname, '', 2, function () {
+                                    _i++;
+                                    if (_i == _auditer.length) {
+                                        history.go(0)
+                                    }
+                                })
                             })
                         })
-                    } else { //2、3
+                    } else { //type = 2、3 
                         debugger;
                         var _status = '';
                         var now = ~~(new Date().getTime() / 1000)
@@ -748,8 +745,14 @@ $(document).ready(function () {
                                 json_p: append_spstatus,
                                 table: 'ga_spstatus'
                             }, function (res2) {
-                                sendmessage(_g.applyid, sendid, sendname, '', 2, function () {
-                                    history.go(0)
+                                var _i = 0;
+                                _auditer.forEach(ele => {
+                                    sendmessage(_g.applyid, ele, sendname, '', 2, function () {
+                                        _i++;
+                                        if (_i == _auditer.length) {
+                                            history.go(0)
+                                        }
+                                    })
                                 })
                             })
                         })
@@ -757,7 +760,6 @@ $(document).ready(function () {
                 })
             })
         }
-
 
         function sendmessage(id, userid, name, ti, type, callback) {
             var titles = ti || '车修申请'
@@ -779,9 +781,7 @@ $(document).ready(function () {
                     callback()
                 },
                 error: function (err) {
-                    // console.log(err)
                     callback()
-
                 }
             })
         }

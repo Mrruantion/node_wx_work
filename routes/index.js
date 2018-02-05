@@ -17,23 +17,30 @@ var addr = require('./_areaData')
 
 // home page
 console.log(addr)
-router.get('/', function (req, res, next) {
+router.get('/home', function (req, res, next) {
     res.render('index', { title: 'Account Information' });
 });
 
 router.get('/my_list', function (req, res, next) {
     res.render('my_list');
-})
+});
+
 router.get('/vehicle_accident', function (req, res, next) {
     res.render('vehicle_accident')
-})
+});
+
+router.get('/', function (req, res, next) {
+    res.render('login');
+});
+
 router.get('/login', function (req, res, next) {
     // console.log(hex_md5(hex_md5(123456)),'222')
     var password = req.query.password;
+    var account = req.query.account || 'ruiadmin';
     var dev_key = "59346d400236ab95e95193f35f3df6a4";
     var app_key = "96a3e23a32d4b81894061fdd29e94319";
     var app_secret = "565975d7d7d01462245984408739804d";
-    wistorm_api.login('ruiadmin', password, function (user) {
+    wistorm_api.login(account, password, function (user) {
         // console.log(user, 'user')
         user.wistorm = {
             dev_key: dev_key,
@@ -43,6 +50,8 @@ router.get('/login', function (req, res, next) {
         res.send(user)
     })
 })
+
+
 
 router.get('/fix_detail', function (req, res, next) {
     res.render('fix_detail');

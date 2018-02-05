@@ -11,7 +11,7 @@
 </head>
 
 <body ontouchstart>
-    <div class="container f14" id="container" style="display:none">
+    <div class="container f14" id="container" style="display:none;overflow:auto;padding-bottom:100px">
         <div class="b_c_w b_b_1">
             <div class="weui-cell">
                 <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
@@ -57,6 +57,19 @@
                     </div>
                     <div class="weui-cell__bd">
                         <p id="province"></p>
+                    </div>
+                </div>
+                <!-- </div> -->
+
+            </div>
+            <div class="weui-flex">
+                <!-- <div class="weui-flex__item"> -->
+                <div class="weui-cell">
+                    <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
+                        <p class="c_9">当前流程</p>
+                    </div>
+                    <div class="weui-cell__bd">
+                        <p id="dqlc"></p>
                     </div>
                 </div>
                 <!-- </div> -->
@@ -175,6 +188,9 @@
                 </div>
             </div> -->
         </div>
+
+    </div>
+    <div>
         <div class="b_c_w submit b_t_1" id="other_button" style="display:none">
             <div class="advice c_9">审批意见</div>
             <div class="weui-flex">
@@ -233,20 +249,21 @@
             </div>
         </div>
         <!-- 我还车 -->
-        <div class="b_c_w submit b_t_1" style="display:none" id="back_car">
+        <div class="b_c_w submit b_t_1" style="display:none" id="my_back_car">
             <div class="weui-flex">
                 <div class="weui-flex__item">
                     <a class="weui-cell weui-cell_access p_0 " href="javascript:;" id="backout_car">
                         <!-- <div class="f14"> -->
                         <div class="weui-media-box weui-media-box_text w_100 t_a_c">
-                            <i class="weui-icon-success-no-circle f14"></i> 还车
+                            <i class="weui-icon-success-no-circle f14"></i> 归还还车
                         </div>
                         <!-- </div> -->
                     </a>
                 </div>
             </div>
         </div>
-        <div class="b_c_w submit b_t_1" style="display:none" id="carlist_back">
+        <!-- 通知车队还车 -->
+        <div class="b_c_w submit b_t_1" style="display:none" id="call_vechicle_back">
             <div class="weui-flex">
                 <div class="weui-flex__item">
                     <a class="weui-cell weui-cell_access p_0 " href="javascript:;">
@@ -260,13 +277,13 @@
             </div>
         </div>
         <!-- 车队还车 -->
-        <div class="b_c_w submit b_t_1" style="display:none" id="back_carlist">
+        <div class="b_c_w submit b_t_1" style="display:none" id="vehicle_back">
             <div class="weui-flex">
                 <div class="weui-flex__item">
                     <a class="weui-cell weui-cell_access p_0 " href="javascript:;" id="">
                         <!-- <div class="f14"> -->
                         <div class="weui-media-box weui-media-box_text w_100 t_a_c">
-                            <i class="weui-icon-success-no-circle f14"></i> 还车
+                            <i class="weui-icon-success-no-circle f14"></i> 归还车辆
                         </div>
                         <!-- </div> -->
                     </a>
@@ -274,7 +291,7 @@
             </div>
         </div>
 
-        <div class="b_c_w submit b_t_1" style="display:none" id="pcar_dd">
+        <div class="b_c_w submit b_t_1" style="display:none" id="other_vehicle_send">
             <div class="weui-flex">
                 <div class="weui-flex__item">
                     <a class="weui-cell weui-cell_access p_0 " href="javascript:;" id="pcar_dd1">
@@ -295,69 +312,9 @@
                 <strong class="weui-dialog__title">同意并选择下一级审核人</strong>
             </div>
             <div class="weui-dialog__bd" style="max-height: 250px; overflow-y: auto;" id="nextAuditer">
-                <label>
-                    <div class="weui-cell weui-cell_access" id="` + str + `">
-                        <input type="radio" style="margin-right:5px" name='auditer' checked/>
-                        <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                            <img src="./img/1.png" style="width: 50px;display: block">
-                        </div>
-                        <div class="weui-cell__bd">
-                            <p>xxx</p>
-                            <p style="font-size: 13px;color: #888888;">公司领导</p>
-                        </div>
-                    </div>
-                </label>
                 <!-- <label>
                     <div class="weui-cell weui-cell_access" id="` + str + `">
-                        <input type="radio" style="margin-right:5px" name='auditer' />
-                        <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                            <img src="./img/1.png" style="width: 50px;display: block">
-                        </div>
-                        <div class="weui-cell__bd">
-                            <p>xxx</p>
-                            <p style="font-size: 13px;color: #888888;">公司领导</p>
-                        </div>
-                    </div>
-                </label>
-                <label>
-                    <div class="weui-cell weui-cell_access" id="` + str + `">
-                        <input type="radio" style="margin-right:5px" name='auditer' />
-                        <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                            <img src="./img/1.png" style="width: 50px;display: block">
-                        </div>
-                        <div class="weui-cell__bd">
-                            <p>xxx</p>
-                            <p style="font-size: 13px;color: #888888;">公司领导</p>
-                        </div>
-                    </div>
-                </label>
-                <label>
-                    <div class="weui-cell weui-cell_access" id="` + str + `">
-                        <input type="radio" style="margin-right:5px" name='auditer' />
-                        <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                            <img src="./img/1.png" style="width: 50px;display: block">
-                        </div>
-                        <div class="weui-cell__bd">
-                            <p>xxx</p>
-                            <p style="font-size: 13px;color: #888888;">公司领导</p>
-                        </div>
-                    </div>
-                </label>
-                <label>
-                    <div class="weui-cell weui-cell_access" id="` + str + `">
-                        <input type="radio" style="margin-right:5px" name='auditer' />
-                        <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                            <img src="./img/1.png" style="width: 50px;display: block">
-                        </div>
-                        <div class="weui-cell__bd">
-                            <p>xxx</p>
-                            <p style="font-size: 13px;color: #888888;">公司领导</p>
-                        </div>
-                    </div>
-                </label>
-                <label>
-                    <div class="weui-cell weui-cell_access" id="` + str + `">
-                        <input type="radio" style="margin-right:5px" name='auditer' />
+                        <input type="radio" style="margin-right:5px" name='auditer' checked/>
                         <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
                             <img src="./img/1.png" style="width: 50px;display: block">
                         </div>
@@ -377,10 +334,12 @@
     <script src="./js/zepto.min.js"></script>
     <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script> -->
     <script src="./js/weui.js"></script>
+    <script src="./js/config.js"></script>
     <script src="js/wistorm/md5.js"></script>
     <script src="./js/public.js"></script>
     <script src="js/wistorm/wistorm.js"></script>
     <script src="./js/my_list.js">
+
         // console.log(_g)
     </script>
 </body>

@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var _user = JSON.parse(localStorage.getItem('user1'));
+    var _user = JSON.parse(sessionStorage.getItem('user'));
     getDepart()
     console.log(_user, 'user')
     var car_data = [];
